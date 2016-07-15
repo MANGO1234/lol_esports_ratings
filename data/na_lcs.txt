@@ -150,4 +150,6 @@ NRG C9 0
 TL FOX 1
 TL FOX 1
 TL FOX 0
+week
+IMT CLG 0
 end
