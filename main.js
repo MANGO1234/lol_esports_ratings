@@ -1,8 +1,10 @@
 /*jslint
-    node: true, esversion: 6
+    node: true, esversion: 6, loopfunc: true
 */
 
 //node main.js na & node main.js na2 & node main.js eu & node main.js eu2 & node main.js lck & node main.js lck2 & node main.js lpl & node main.js lpl2
+
+'use strict';
 
 var league = {
     na: {
@@ -90,8 +92,7 @@ lineReader.on('line', function(line) {
     }
 });
 
-
-lineReader.on('close', function() {
+function getPool(stateData) {
     var ranking = new glicko2.Glicko2({
         tau: 0.5,
         rating: 1500,
@@ -113,42 +114,51 @@ lineReader.on('close', function() {
         return players[name].player;
     }
 
-    var toMatch = (datum) => {
-        return [getPlayer(datum.player1), getPlayer(datum.player2), datum.result];
-    };
-
-    var addHistory = function(week, player) {
-        player.history[week] = {
-            rating: player.player.getRating(),
-            rd: player.player.getRd(),
-            vol: player.player.getVol()
-        };
-    };
-
     for (var i = 0; i < stateData.weeks.length; i++) {
-        var matches = stateData.weeks[i].map(toMatch);
+        var matches = stateData.weeks[i].map((datum) => {
+            return [getPlayer(datum.player1), getPlayer(datum.player2), datum.result];
+        });
         ranking.updateRatings(matches);
         weeksUsed.push(i);
-        _.values(players).forEach(_.partial(addHistory, i));
+        _.values(players).forEach((player) => {
+            player.history[i] = {
+                rating: player.player.getRating(),
+                rd: player.player.getRd(),
+                vol: player.player.getVol()
+            };
+        });
     }
+
+    return {
+        players: players,
+        weeksUsed: weeksUsed
+    };
+}
+
+function ratingToWinRate(p1, p2) {
+    return 1 / (1 + Math.pow(10, (p2.player.getRating() - p1.player.getRating()) / 400));
+}
+
+lineReader.on('close', function() {
+    var pool = getPool(stateData);
+    var players = pool.players;
+    var weeksUsed = pool.weeksUsed;
 
     var playersA = _.values(players);
     playersA.sort(function(v1, v2) {
         return v2.player.getRating() - v1.player.getRating();
     });
 
-    function ratingToWinRate(p1, p2) {
-        return 1 / (1 + Math.pow(10, (p2.player.getRating() - p1.player.getRating()) / 400));
-    }
-
     var stream = fs.createWriteStream(league[process.argv[2]].out);
     stream.once('open', function() {
         function write(s) {
             if (s !== undefined && s !== '') {
                 stream.write(s);
+                console.log(s);
+            } else {
+                console.log();
             }
             stream.write('\n');
-            console.log(s);
         }
 
         write('******** ' + stateData.name + ' ********');

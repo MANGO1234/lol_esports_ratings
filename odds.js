@@ -1,8 +1,10 @@
 /*jslint
-    node: true, esversion: 6
+    node: true, esversion: 6, loopfunc: true
 */
 
 //node main.js na & node main.js na2 & node main.js eu & node main.js eu2 & node main.js lck & node main.js lck2 & node main.js lpl & node main.js lpl2
+
+'use strict';
 
 var bo2s = [
     [0, 0],
@@ -142,7 +144,7 @@ lineReader.on('line', function(line) {
 });
 
 
-lineReader.on('close', function() {
+function getPool(stateData) {
     var ranking = new glicko2.Glicko2({
         tau: 0.5,
         rating: 1500,
@@ -164,27 +166,162 @@ lineReader.on('close', function() {
         return players[name].player;
     }
 
-    var toMatch = (datum) => {
-        return [getPlayer(datum.player1), getPlayer(datum.player2), datum.result];
-    };
-
-    var addHistory = function(week, player) {
-        player.history[week] = {
-            rating: player.player.getRating(),
-            rd: player.player.getRd(),
-            vol: player.player.getVol()
-        };
-    };
-
     for (var i = 0; i < stateData.weeks.length; i++) {
-        var matches = stateData.weeks[i].map(toMatch);
+        var matches = stateData.weeks[i].map((datum) => {
+            return [getPlayer(datum.player1), getPlayer(datum.player2), datum.result];
+        });
         ranking.updateRatings(matches);
         weeksUsed.push(i);
-        _.values(players).forEach(_.partial(addHistory, i));
+        _.values(players).forEach((player) => {
+            player.history[i] = {
+                rating: player.player.getRating(),
+                rd: player.player.getRd(),
+                vol: player.player.getVol()
+            };
+        });
     }
 
-    var playersA = _.values(players);
-    playersA.sort(function(v1, v2) {
-        return v2.player.getRating() - v1.player.getRating();
-    });
+    return {
+        players: players,
+        weeksUsed: weeksUsed
+    };
+}
+
+function ratingToWinRate(p1, p2) {
+    return 1 / (1 + Math.pow(10, (p2.player.getRating() - p1.player.getRating()) / 400));
+}
+
+lineReader.on('close', function() {
+    var pool = getPool(stateData);
+    var players = pool.players;
+    var weeksUsed = pool.weeksUsed;
+
+    var p1 = pool.players[process.argv[3]];
+    var p2 = pool.players[process.argv[4]];
+    if (!(p1 && p2)) {
+        throw new Error('Unknown players');
+    }
+
+    function count(a) {
+        var c = 0;
+        for (var i = 0; i < a.length; i++) {
+            c += a[i];
+        }
+        return c;
+    }
+
+    function staticP(p, a) {
+        var c = 1;
+        for (var i = 0; i < a.length; i++) {
+            c *= a[i] === 1 ? p : 1 - p;
+        }
+        return c;
+    }
+
+    function findOdds(f) {
+        var p = ratingToWinRate(p1, p2);
+        var o = {};
+        o.bo1 = {};
+        o.bo1.win = p;
+        o.bo1.lose = 1 - o.bo1.win;
+
+        counts = [0, 0, 0];
+        for (let i = 0; i < bo2s.length; i++) {
+            counts[count(bo2s[i])] += f(bo2s[i]);
+        }
+
+        o.bo2 = {};
+        o.bo2.win = counts[2];
+        o.bo2.draw = counts[1];
+        o.bo2.lose = counts[0];
+        o.bo2.equal = counts;
+        o.bo2.lesser = [o.bo2.equal[0]];
+        for (let i = 1; i < counts.length; i++) {
+            o.bo2.lesser[i] = o.bo2.lesser[i - 1] + counts[i];
+        }
+        o.bo2.greater = [1];
+        for (let i = 0; i < counts.length - 1; i++) {
+            o.bo2.greater[i + 1] = o.bo2.greater[i] - counts[i];
+        }
+
+        var counts = [0, 0, 0, 0];
+        for (let i = 0; i < bo3s.length; i++) {
+            counts[count(bo3s[i])] += f(bo3s[i]);
+        }
+
+        o.bo3 = {};
+        o.bo3.win = counts[2] + counts[3];
+        o.bo3.lose = 1 - o.bo3.win;
+        o.bo3.equal = counts;
+        o.bo3.lesser = [o.bo3.equal[0]];
+        for (let i = 1; i < counts.length; i++) {
+            o.bo3.lesser[i] = o.bo3.lesser[i - 1] + counts[i];
+        }
+        o.bo3.greater = [1];
+        for (let i = 0; i < counts.length - 1; i++) {
+            o.bo3.greater[i + 1] = o.bo3.greater[i] - counts[i];
+        }
+
+        counts = [0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < bo5s.length; i++) {
+            counts[count(bo5s[i])] += f(bo5s[i]);
+        }
+
+        o.bo5 = {};
+        o.bo5.win = counts[2] + counts[3] + counts[4];
+        o.bo5.lose = 1 - o.bo5.win;
+        o.bo5.equal = counts;
+        o.bo5.lesser = [o.bo5.equal[0]];
+        for (let i = 1; i < counts.length; i++) {
+            o.bo5.lesser[i] = o.bo5.lesser[i - 1] + counts[i];
+        }
+        o.bo5.greater = [1];
+        for (let i = 0; i < counts.length - 1; i++) {
+            o.bo5.greater[i + 1] = o.bo5.greater[i] - counts[i];
+        }
+
+        return o;
+    }
+
+    var odds = {
+        staticP: findOdds(_.partial(staticP, ratingToWinRate(p1, p2)))
+    };
+
+    function print(t, p) {
+        console.log(printf('%-20s %-12.2f %-12.4f', t, 1 / p, p * 100));
+    }
+    console.log(printf('%-20s %-12s %-12s %-12s %-12s', 'Type', 'Stat (O)', 'Stat (%)', 'Dyna (O)', 'Dyna (%)'));
+    print('bo1 win', odds.staticP.bo1.win);
+    print('bo1 lose', odds.staticP.bo1.lose);
+    print('bo2 win', odds.staticP.bo2.win);
+    print('bo2 lose', odds.staticP.bo2.lose);
+    print('bo2 draw', odds.staticP.bo2.draw);
+    for (let i = 1; i < odds.staticP.bo2.equal.length - 1; i++) {
+        print('bo2 win <=' + i, odds.staticP.bo2.lesser[i]);
+    }
+    for (let i = 1; i < odds.staticP.bo2.equal.length - 1; i++) {
+        print('bo2 win >= ' + i, odds.staticP.bo2.greater[i]);
+    }
+    print('bo3 win', odds.staticP.bo3.win);
+    print('bo3 lose', odds.staticP.bo3.lose);
+    for (let i = 0; i <= odds.staticP.bo3.equal.length; i++) {
+        print('bo3 win ' + i, odds.staticP.bo3.equal[i]);
+    }
+    for (let i = 1; i < odds.staticP.bo3.equal.length - 1; i++) {
+        print('bo3 win <=' + i, odds.staticP.bo3.lesser[i]);
+    }
+    for (let i = 1; i < odds.staticP.bo3.equal.length - 1; i++) {
+        print('bo3 win >= ' + i, odds.staticP.bo3.greater[i]);
+    }
+    print('bo5 win', odds.staticP.bo5.win);
+    print('bo5 lose', odds.staticP.bo5.lose);
+    for (let i = 0; i <= odds.staticP.bo5.equal.length; i++) {
+        print('bo5 win ' + i, odds.staticP.bo5.equal[i]);
+    }
+    for (let i = 1; i < odds.staticP.bo5.equal.length - 1; i++) {
+        print('bo5 win <=' + i, odds.staticP.bo5.lesser[i]);
+    }
+    for (let i = 1; i < odds.staticP.bo5.equal.length - 1; i++) {
+        print('bo5 win >= ' + i, odds.staticP.bo5.greater[i]);
+    }
 });
