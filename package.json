@@ -1,0 +1,9 @@
+{
+  "name": "lcs",
+  "description": "lcs",
+  "devDependencies": {
+    "glicko2": "0.8.4",
+    "lodash": "4.13.1",
+    "printf": "0.2.5"
+  }
+}

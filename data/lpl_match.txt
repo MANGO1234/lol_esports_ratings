@@ -1,0 +1,69 @@
+start
+LPL (By Matches)
+week
+EDG NB 1
+Snake GT 0
+RNG WE 1
+OMG IMay 0
+EDG Snake 1
+GT SAT 1
+NB iG 1
+LGD IMay 0
+RNG VG 1
+WE OMG 1
+week
+VG LGD 1
+WE IMay 1
+NB GT 0
+iG SAT 1
+RNG OMG 1
+VG IMay 1
+WE LGD 1
+EDG SAT 1
+iG GT 1
+NB Snake 0
+week
+Snake SAT 1
+EDG iG 1
+RNG LGD 1
+VG OMG 1
+Snake iG 1
+NB SAT 1
+EDG GT 1
+WE VG 1
+RNG IMay 1
+LGD OMG 1
+week
+EDG RNG 1
+iG OMG 0
+GT WE 1
+LGD Snake 1
+NB VG 1
+iG RNG 0
+SAT IMay 0
+GT LGD 1
+Snake WE 1
+week
+VG SAT 1
+EDG OMG 1
+NB IMay 0
+iG WE 0
+Snake OMG 1
+EDG VG 1
+LGD SAT 1
+GT IMay 0
+NB RNG 0
+week
+WE SAT 1
+GT RNG 0
+iG IMay 0
+OMG NB 1
+GT VG 0
+RNG Snake 1
+EDG WE 1
+NB LGD 1
+SAT OMG 1
+week
+VG iG 1
+# week not done
+end
