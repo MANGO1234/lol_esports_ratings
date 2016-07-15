@@ -5,15 +5,15 @@
 //mkdir out; { node main.js data/na_lcs.txt; node main.js data/na_lcs_match.txt; node main.js data/eu_lcs.txt; node main.js data/eu_lcs_match.txt; node main.js data/lck.txt; node main.js data/lck_match.txt; node main.js data/lpl.txt; node main.js data/lpl_match.txt; } > out/ratings.txt
 //mkdir out; { node main.js data/na_lcs.txt; node main.js data/eu_lcs.txt; node main.js data/lck.txt; node main.js data/lpl.txt; } > out/ratings.txt
 //mkdir out; { node main.js data/na_lcs_match.txt; node main.js data/eu_lcs_match.txt; node main.js data/lck_match.txt; node main.js data/lpl_match.txt; } > out/ratings.txt
-//mkdir out & node main.js data\na_lcs.txt > out\na_lcs.txt & type out\na_lcs.txt
+//mkdir out & node main.js data\na_lcs.txt 3 > out\na_lcs.txt & type out\na_lcs.txt
 //mkdir out & node main.js data\na_lcs_match.txt > out\na_lcs_match.txt & type out\na_lcs_match.txt
-//mkdir out & node main.js data\eu_lcs.txt > out\eu_lcs.txt & type out\eu_lcs.txt
+//mkdir out & node main.js data\eu_lcs.txt 2 > out\eu_lcs.txt & type out\eu_lcs.txt
 //mkdir out & node main.js data\eu_lcs_match.txt > out\eu_lcs_match.txt & type out\eu_lcs_match.txt
-//mkdir out & node main.js data\lck.txt > out\lck.txt & type out\lck.txt
+//mkdir out & node main.js data\lck.txt 3 > out\lck.txt & type out\lck.txt
 //mkdir out & node main.js data\lck_match.txt > out\lck_match.txt & type out\lck_match.txt
-//mkdir out & node main.js data\lpl.txt > out\lpl.txt & type out\lpl.txt
+//mkdir out & node main.js data\lpl.txt 3 > out\lpl.txt & type out\lpl.txt
 //mkdir out & node main.js data\lpl_match.txt > out\lpl_match.txt & type out\lpl_match.txt
-//mkdir out & node main.js data\na_lcs.txt > out\na_lcs.txt & type out\na_lcs.txt & node main.js data\na_lcs_match.txt > out\na_lcs_match.txt & type out\na_lcs_match.txt & node main.js data\eu_lcs.txt > out\eu_lcs.txt & type out\eu_lcs.txt & node main.js data\eu_lcs_match.txt > out\eu_lcs_match.txt & type out\eu_lcs_match.txt & node main.js data\lck.txt > out\lck.txt & type out\lck.txt & node main.js data\lck_match.txt > out\lck_match.txt & type out\lck_match.txt & node main.js data\lpl.txt > out\lpl.txt & type out\lpl.txt & node main.js data\lpl_match.txt > out\lpl_match.txt & type out\lpl_match.txt
+//mkdir out & node main.js data\na_lcs.txt 3 > out\na_lcs.txt & type out\na_lcs.txt & node main.js data\na_lcs_match.txt > out\na_lcs_match.txt & type out\na_lcs_match.txt & node main.js data\eu_lcs.txt 2 > out\eu_lcs.txt & type out\eu_lcs.txt & node main.js data\eu_lcs_match.txt > out\eu_lcs_match.txt & type out\eu_lcs_match.txt & node main.js data\lck.txt 3 > out\lck.txt & type out\lck.txt & node main.js data\lck_match.txt > out\lck_match.txt & type out\lck_match.txt & node main.js data\lpl.txt 3 > out\lpl.txt & type out\lpl.txt & node main.js data\lpl_match.txt > out\lpl_match.txt & type out\lpl_match.txt
 
 var glicko2 = require('glicko2');
 var _ = require('lodash');
@@ -33,8 +33,7 @@ var lineReader = require('readline').createInterface({
 });
 
 lineReader.on('line', function(line) {
-    if (line.charAt(0) == '#') {
-    } else if (state == STANDBY && line == 'start') {
+    if (line.charAt(0) == '#') {} else if (state == STANDBY && line == 'start') {
         state = READING_TITLE;
         stateData.week = -1;
     } else if (state == READING_TITLE) {
@@ -107,7 +106,7 @@ lineReader.on('close', function() {
     });
 
     function ratingToWinRate(p1, p2) {
-        return 1/(1+Math.pow(10, (p2.player.getRating() - p1.player.getRating)/400));
+        return 1 / (1 + Math.pow(10, (p2.player.getRating() - p1.player.getRating()) / 400));
     }
 
     console.log('******** ' + stateData.name + ' ********');
@@ -140,6 +139,105 @@ lineReader.on('close', function() {
         })));
     });
     console.log();
+
+    console.log('**** Estimated Win Rates (BO1) ****');
+    formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
+    console.log(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
+    formatS = '%-6s' + _.repeat('%-8.2f ', playersA.length);
+    playersA.forEach(function(p1) {
+        console.log(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => ratingToWinRate(p1, p2) * 100)));
+    });
+    console.log();
+
+    console.log('**** Estimated Odds (B01) ****');
+    formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
+    console.log(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
+    formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
+    playersA.forEach(function(p1) {
+        console.log(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => 1 / ratingToWinRate(p1, p2))));
+    });
+    console.log();
+
+    if (process.argv[3] == '2') {
+
+    } else if (process.argv[3] === '3') {
+        console.log('**** Estimated Win Rates (BO3) ****');
+        formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
+        console.log(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
+        formatS = '%-6s' + _.repeat('%-8.2f ', playersA.length);
+        playersA.forEach(function(p1) {
+            console.log(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
+                var p = ratingToWinRate(p1, p2);
+                return p * p * (3 - 2 * p) * 100;
+            })));
+        });
+        console.log();
+
+        console.log('**** Estimated Odds (BO3) ****');
+        formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
+        console.log(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
+        formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
+        playersA.forEach(function(p1) {
+            console.log(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
+                var p = ratingToWinRate(p1, p2);
+                p = p * p * (3 - 2 * p);
+                return 1 / p;
+            })));
+        });
+        console.log();
+
+        console.log('**** Estimated Odds (BO3, 0 games) ****');
+        formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
+        console.log(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
+        formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
+        playersA.forEach(function(p1) {
+            console.log(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
+                var p = ratingToWinRate(p1, p2);
+                p = (1-p) * (1-p);
+                return 1 / p;
+            })));
+        });
+        console.log();
+
+        console.log('**** Estimated Odds (BO3, at least 1 game) ****');
+        formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
+        console.log(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
+        formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
+        playersA.forEach(function(p1) {
+            console.log(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
+                var p = ratingToWinRate(p1, p2);
+                p = 1-(1-p) * (1-p);
+                return 1 / p;
+            })));
+        });
+        console.log();
+
+        console.log('**** Estimated Odds (BO3, less than 2 games) ****');
+        formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
+        console.log(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
+        formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
+        playersA.forEach(function(p1) {
+            console.log(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
+                var p = ratingToWinRate(p1, p2);
+                p = (1-p) * (1-p)+p*p;
+                return 1 / p;
+            })));
+        });
+        console.log();
+
+        console.log('**** Estimated Odds (BO3, 3 games) ****');
+        formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
+        console.log(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
+        formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
+        playersA.forEach(function(p1) {
+            console.log(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
+                var p = ratingToWinRate(p1, p2);
+                p = 1-(1-p) * (1-p)-p*p;
+                return 1 / p;
+            })));
+        });
+        console.log();
+    }
 });
 
 function mean(arr) {
