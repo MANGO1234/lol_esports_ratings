@@ -130,6 +130,7 @@ function getPool(stateData) {
     }
 
     return {
+        ranking: ranking,
         players: players,
         weeksUsed: weeksUsed
     };

@@ -182,6 +182,7 @@ function getPool(stateData) {
     }
 
     return {
+        ranking: ranking,
         players: players,
         weeksUsed: weeksUsed
     };
@@ -214,6 +215,22 @@ lineReader.on('close', function() {
         var c = 1;
         for (var i = 0; i < a.length; i++) {
             c *= a[i] === 1 ? p : 1 - p;
+        }
+        return c;
+    }
+
+    function dynamicP(a) {
+        var pool = getPool(stateData);
+        var players = pool.players;
+        var p1 = pool.players[process.argv[3]];
+        var p2 = pool.players[process.argv[4]];
+        var c = 1;
+        for (var i = 0; i < a.length; i++) {
+            var p = ratingToWinRate(p1, p2);
+            c *= a[i] === 1 ? p : 1 - p;
+            pool.ranking.updateRatings([
+                [p1.player, p2.player, a[i]]
+            ]);
         }
         return c;
     }
@@ -284,44 +301,45 @@ lineReader.on('close', function() {
     }
 
     var odds = {
-        staticP: findOdds(_.partial(staticP, ratingToWinRate(p1, p2)))
+        staticP: findOdds(_.partial(staticP, ratingToWinRate(p1, p2))),
+        dynamicP: findOdds(dynamicP),
     };
 
-    function print(t, p) {
-        console.log(printf('%-20s %-12.2f %-12.4f', t, 1 / p, p * 100));
+    function print(t, p, q) {
+        console.log(printf('%-20s %-12.4f %-12.4f %-12.2f %-12.2f', t, 1 / p, 1 / q, p * 100, q * 100));
     }
-    console.log(printf('%-20s %-12s %-12s %-12s %-12s', 'Type', 'Stat (O)', 'Stat (%)', 'Dyna (O)', 'Dyna (%)'));
-    print('bo1 win', odds.staticP.bo1.win);
-    print('bo1 lose', odds.staticP.bo1.lose);
-    print('bo2 win', odds.staticP.bo2.win);
-    print('bo2 lose', odds.staticP.bo2.lose);
-    print('bo2 draw', odds.staticP.bo2.draw);
+    console.log(printf('%-20s %-12s %-12s %-12s %-12s', 'Type', 'Stat (O)', 'Dyna (O)', 'Stat (%)', 'Dyna (%)'));
+    print('bo1 win', odds.staticP.bo1.win, odds.dynamicP.bo1.win);
+    print('bo1 lose', odds.staticP.bo1.lose, odds.dynamicP.bo1.lose);
+    print('bo2 win', odds.staticP.bo2.win, odds.dynamicP.bo2.win);
+    print('bo2 lose', odds.staticP.bo2.lose, odds.dynamicP.bo2.lose);
+    print('bo2 draw', odds.staticP.bo2.draw, odds.dynamicP.bo2.draw);
     for (let i = 1; i < odds.staticP.bo2.equal.length - 1; i++) {
-        print('bo2 win <=' + i, odds.staticP.bo2.lesser[i]);
+        print('bo2 win <=' + i, odds.staticP.bo2.lesser[i], odds.dynamicP.bo2.lesser[i]);
     }
     for (let i = 1; i < odds.staticP.bo2.equal.length - 1; i++) {
-        print('bo2 win >= ' + i, odds.staticP.bo2.greater[i]);
+        print('bo2 win >= ' + i, odds.staticP.bo2.greater[i], odds.dynamicP.bo2.greater[i]);
     }
-    print('bo3 win', odds.staticP.bo3.win);
-    print('bo3 lose', odds.staticP.bo3.lose);
+    print('bo3 win', odds.staticP.bo3.win, odds.dynamicP.bo3.win);
+    print('bo3 lose', odds.staticP.bo3.lose, odds.dynamicP.bo3.lose);
     for (let i = 0; i <= odds.staticP.bo3.equal.length; i++) {
-        print('bo3 win ' + i, odds.staticP.bo3.equal[i]);
+        print('bo3 win ' + i, odds.staticP.bo3.equal[i], odds.dynamicP.bo3.equal[i]);
     }
     for (let i = 1; i < odds.staticP.bo3.equal.length - 1; i++) {
-        print('bo3 win <=' + i, odds.staticP.bo3.lesser[i]);
+        print('bo3 win <=' + i, odds.staticP.bo3.lesser[i], odds.dynamicP.bo3.lesser[i]);
     }
     for (let i = 1; i < odds.staticP.bo3.equal.length - 1; i++) {
-        print('bo3 win >= ' + i, odds.staticP.bo3.greater[i]);
+        print('bo3 win >= ' + i, odds.staticP.bo3.greater[i], odds.dynamicP.bo3.greater[i]);
     }
-    print('bo5 win', odds.staticP.bo5.win);
-    print('bo5 lose', odds.staticP.bo5.lose);
+    print('bo5 win', odds.staticP.bo5.win, odds.dynamicP.bo5.win);
+    print('bo5 lose', odds.staticP.bo5.lose, odds.dynamicP.bo5.lose);
     for (let i = 0; i <= odds.staticP.bo5.equal.length; i++) {
-        print('bo5 win ' + i, odds.staticP.bo5.equal[i]);
+        print('bo5 win ' + i, odds.staticP.bo5.equal[i], odds.dynamicP.bo5.equal[i]);
     }
     for (let i = 1; i < odds.staticP.bo5.equal.length - 1; i++) {
-        print('bo5 win <=' + i, odds.staticP.bo5.lesser[i]);
+        print('bo5 win <=' + i, odds.staticP.bo5.lesser[i], odds.dynamicP.bo5.lesser[i]);
     }
     for (let i = 1; i < odds.staticP.bo5.equal.length - 1; i++) {
-        print('bo5 win >= ' + i, odds.staticP.bo5.greater[i]);
+        print('bo5 win >= ' + i, odds.staticP.bo5.greater[i], odds.dynamicP.bo5.greater[i]);
     }
 });
