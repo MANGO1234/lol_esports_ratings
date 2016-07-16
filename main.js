@@ -27,6 +27,11 @@ var league = {
         bo: 3,
         out: 'out\\lpl.txt'
     },
+    lms: {
+        data: 'data\\lms.txt',
+        bo: 3,
+        out: 'out\\lms.txt'
+    },
 };
 
 var glicko2 = require('glicko2');

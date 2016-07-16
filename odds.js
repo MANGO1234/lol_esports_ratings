@@ -76,6 +76,11 @@ var league = {
         bo: 3,
         out: 'out\\lpl.txt'
     },
+    lms: {
+        data: 'data\\lms.txt',
+        bo: 3,
+        out: 'out\\lms.txt'
+    },
 };
 
 var glicko2 = require('glicko2');
@@ -316,7 +321,7 @@ lineReader.on('close', function() {
     print('bo5 win 3-2', odds.staticP.bo5.results.w3x2, odds.dynamicP.bo5.results.w3x2);
     print('bo5 win 2-3', odds.staticP.bo5.results.w2x3, odds.dynamicP.bo5.results.w2x3);
     print('bo5 win 1-3', odds.staticP.bo5.results.w1x3, odds.dynamicP.bo5.results.w1x3);
-    print('bo5 win 0-3', odds.staticP.bo5.results.w0x3, odds.dynamicP.bo5.results.w0x2);
+    print('bo5 win 0-3', odds.staticP.bo5.results.w0x3, odds.dynamicP.bo5.results.w0x3);
     print('bo5 last 3 games', odds.staticP.bo5.lengths.g3, odds.dynamicP.bo5.lengths.g3);
     print('bo5 last 4 games', odds.staticP.bo5.lengths.g4, odds.dynamicP.bo5.lengths.g4);
     print('bo5 last 5 games', odds.staticP.bo5.lengths.g5, odds.dynamicP.bo5.lengths.g5);

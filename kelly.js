@@ -89,7 +89,7 @@ lineReader.on('close', function() {
     });
 
     stateData.todo.sort(function(a, b) {
-        return a.k - b.k;
+        return b.k - a.k;
     });
 
     console.log('Current Capital: ' + capital);
