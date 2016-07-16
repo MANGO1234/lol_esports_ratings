@@ -145,5 +145,12 @@ SAT OMG 1
 week
 VG iG 1
 VG iG 1
+EDG LGD 1
+EDG LGD 1
+EDG LGD 0
+Snake IMay 0
+Snake IMay 0
+NB WE 0
+NB WE 0
 # week not done
 end

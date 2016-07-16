@@ -1,0 +1,59 @@
+start
+week
+JTeam Machi 1
+JTeam Machi 0
+MS FW 0
+MS FW 0
+JTeam XG 1
+JTeam XG 1
+Machi HKE 0
+Machi HKE 0
+HKE XG 1
+HKE XG 1
+Mist ahq 0
+Mist ahq 0
+week
+MS Mist 1
+MS Mist 1
+HKE JTeam 0
+HKE JTeam 0
+ahq MS 1
+ahq MS 1
+FW Mist 1
+FW Mist 1
+XG Machi 0
+XG Machi 0
+FW ahq 1
+FW ahq 1
+week
+Mist Machi 0
+Mist Machi 0
+XG MS 0
+XG MS 0
+JTeam Mist 1
+JTeam Mist 1
+FW XG 1
+FW XG 1
+Machi ahq 0
+Machi ahq 0
+HKE FW 0
+HKE FW 0
+week
+ahq JTeam 0
+ahq JTeam 0
+MS HKE 1
+MS HKE 0
+Mist XG 0
+Mist XG 0
+ahq HKE 1
+ahq HKE 1
+MS JTeam 0
+MS JTeam 0
+FW Machi 1
+FW Machi 1
+week
+XG ahq 0
+XG ahq 0
+HKE Mist 1
+HKE Mist 1
+end

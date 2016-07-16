@@ -143,6 +143,11 @@ Ever AFs 1
 Ever AFs 1
 Ever AFs 0
 CJ LZ 0
-CJ LZ 0
+# CJ LZ 0 JAG KT 1 teemo game = not really game
+JAG KT 0
+JAG KT 0
+# JAG KT 1 teemo pick = not really game
+MVP AFs 0
+MVP AFs 0
 # week not done
 end
