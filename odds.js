@@ -2,8 +2,6 @@
     node: true, esversion: 6, loopfunc: true
 */
 
-//node main.js na & node main.js na2 & node main.js eu & node main.js eu2 & node main.js lck & node main.js lck2 & node main.js lpl & node main.js lpl2
-
 'use strict';
 
 var bo2s = [
@@ -63,39 +61,22 @@ var league = {
         bo: 3,
         out: 'out\\na_lcs.txt'
     },
-    na2: {
-        data: 'data\\na_lcs_match.txt',
-        out: 'out\\na_lcs_match.txt'
-    },
     eu: {
         data: 'data\\eu_lcs.txt',
         bo: 2,
         out: 'out\\eu_lcs.txt'
-    },
-    eu2: {
-        data: 'data\\eu_lcs_match.txt',
-        out: 'out\\eu_lcs_match.txt'
     },
     lck: {
         data: 'data\\lck.txt',
         bo: 3,
         out: 'out\\lck.txt'
     },
-    lck2: {
-        data: 'data\\lck_match.txt',
-        out: 'out\\lck_match.txt'
-    },
     lpl: {
         data: 'data\\lpl.txt',
         bo: 3,
         out: 'out\\lpl.txt'
     },
-    lpl2: {
-        data: 'data\\lpl_match.txt',
-        out: 'out\\lpl_match.txt'
-    },
 };
-
 
 var glicko2 = require('glicko2');
 var _ = require('lodash');
