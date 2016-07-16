@@ -12,39 +12,22 @@ var league = {
         bo: 3,
         out: 'out\\na_lcs.txt'
     },
-    na2: {
-        data: 'data\\na_lcs_match.txt',
-        out: 'out\\na_lcs_match.txt'
-    },
     eu: {
         data: 'data\\eu_lcs.txt',
         bo: 2,
         out: 'out\\eu_lcs.txt'
-    },
-    eu2: {
-        data: 'data\\eu_lcs_match.txt',
-        out: 'out\\eu_lcs_match.txt'
     },
     lck: {
         data: 'data\\lck.txt',
         bo: 3,
         out: 'out\\lck.txt'
     },
-    lck2: {
-        data: 'data\\lck_match.txt',
-        out: 'out\\lck_match.txt'
-    },
     lpl: {
         data: 'data\\lpl.txt',
         bo: 3,
         out: 'out\\lpl.txt'
     },
-    lpl2: {
-        data: 'data\\lpl_match.txt',
-        out: 'out\\lpl_match.txt'
-    },
 };
-
 
 var glicko2 = require('glicko2');
 var _ = require('lodash');
@@ -202,15 +185,6 @@ lineReader.on('close', function() {
         });
         write();
 
-        write('**** Estimated Odds (B01) ****');
-        formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
-        write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
-        formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
-        playersA.forEach(function(p1) {
-            write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => 1 / ratingToWinRate(p1, p2))));
-        });
-        write();
-
         if (league[process.argv[2]].bo == 2) {
             write('**** Estimated Win Rates (BO2) ****');
             formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
@@ -255,71 +229,6 @@ lineReader.on('close', function() {
                 write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
                     var p = ratingToWinRate(p1, p2);
                     return p * p * (3 - 2 * p) * 100;
-                })));
-            });
-            write();
-
-            write('**** Estimated Odds (BO3) ****');
-            formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
-            write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
-            formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
-            playersA.forEach(function(p1) {
-                write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
-                    var p = ratingToWinRate(p1, p2);
-                    p = p * p * (3 - 2 * p);
-                    return 1 / p;
-                })));
-            });
-            write();
-
-            write('**** Estimated Odds (BO3, 0 games) ****');
-            formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
-            write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
-            formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
-            playersA.forEach(function(p1) {
-                write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
-                    var p = ratingToWinRate(p1, p2);
-                    p = (1 - p) * (1 - p);
-                    return 1 / p;
-                })));
-            });
-            write();
-
-            write('**** Estimated Odds (BO3, at least 1 game) ****');
-            formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
-            write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
-            formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
-            playersA.forEach(function(p1) {
-                write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
-                    var p = ratingToWinRate(p1, p2);
-                    p = 1 - (1 - p) * (1 - p);
-                    return 1 / p;
-                })));
-            });
-            write();
-
-            write('**** Estimated Odds (BO3, less than 2 games) ****');
-            formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
-            write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
-            formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
-            playersA.forEach(function(p1) {
-                write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
-                    var p = ratingToWinRate(p1, p2);
-                    p = (1 - p) * (1 - p) + p * p;
-                    return 1 / p;
-                })));
-            });
-            write();
-
-            write('**** Estimated Odds (BO3, 3 games) ****');
-            formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
-            write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
-            formatS = '%-6s' + _.repeat('%-8.4f ', playersA.length);
-            playersA.forEach(function(p1) {
-                write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
-                    var p = ratingToWinRate(p1, p2);
-                    p = 1 - (1 - p) * (1 - p) - p * p;
-                    return 1 / p;
                 })));
             });
             write();
