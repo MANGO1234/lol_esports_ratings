@@ -4,6 +4,8 @@
   "devDependencies": {
     "glicko2": "0.8.4",
     "lodash": "4.13.1",
-    "printf": "0.2.5"
+    "printf": "0.2.5",
+    "cheerio": "0.20.0",
+    "request": "2.73.0"
   }
 }
