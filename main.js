@@ -213,6 +213,7 @@ lineReader.on('close', function() {
                     return 1 / (1 - p * p - (1 - p) * (1 - p));
                 })));
             });
+            write();
 
             write('**** Estimated Loss Rates (BO2) ****');
             formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
@@ -239,6 +240,13 @@ lineReader.on('close', function() {
             write();
         }
 
+        function score(r,w) {
+            if (r == 1) {
+                return w-0.5;
+            } else {
+                return 0.5-w;
+            }
+        }
 
         stateData.weeks.forEach(function(week) {
             week.forEach(function(match) {
@@ -261,8 +269,13 @@ lineReader.on('close', function() {
                     p1.w += 1 - match.result;
                     p2.w += 1 - match.result;
                 }
-                p1.d1 += Math.pow(ratingToWinRate(p1, p2) - match.result, 2);
-                p2.d1 += Math.pow(ratingToWinRate(p2, p1) - (1-match.result), 2);
+                if (match.result == 1) {
+                    p1.d1 += score(1, ratingToWinRate(p1, p2));
+                    p2.d1 += score(0, ratingToWinRate(p2, p1));
+                } else {
+                    p1.d1 += score(0, ratingToWinRate(p1, p2));
+                    p2.d1 += score(1, ratingToWinRate(p2, p1));
+                }
                 p1.total++;
                 p2.total++;
             });
@@ -272,7 +285,7 @@ lineReader.on('close', function() {
         // write(printf('%-8s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max'));
         playersA.forEach(function(v, i) {
             write(printf('%-8d %-8s %-8.1f %-3d %-3d %-8.4f %-8.4f', i + 1, v.name, v.player.getRating(), v.total, v.w, v.w / v.total,
-                Math.sqrt(v.d1 / v.total)));
+                v.d1 / v.total));
         });
         write();
     });
