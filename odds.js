@@ -269,6 +269,8 @@ lineReader.on('close', function() {
         o.bo3.lengths = {};
         o.bo3.lengths.g2 = results.w2x0+results.w0x2;
         o.bo3.lengths.g3 = results.w2x1+results.w1x2;
+        o.bo3.lengths.w1 = results.w2x1+results.w1x2+results.w0x2;
+        o.bo3.lengths.w2 = results.w1x2+results.w2x1+results.w2x0;
 
         results = {};
         for (let i = 0; i < bo5s.length; i++) {
@@ -312,6 +314,8 @@ lineReader.on('close', function() {
     print('bo3 win 2-1', odds.staticP.bo3.results.w2x1, odds.dynamicP.bo3.results.w2x1);
     print('bo3 win 1-2', odds.staticP.bo3.results.w1x2, odds.dynamicP.bo3.results.w1x2);
     print('bo3 win 0-2', odds.staticP.bo3.results.w0x2, odds.dynamicP.bo3.results.w0x2);
+    print('bo3 win 2-1/1-2/0-2', odds.staticP.bo3.lengths.w1, odds.dynamicP.bo3.lengths.w1);
+    print('bo3 win 1-2/2-1/2-0', odds.staticP.bo3.lengths.w2, odds.dynamicP.bo3.lengths.w2);
     print('bo3 last 2 games', odds.staticP.bo3.lengths.g2, odds.dynamicP.bo3.lengths.g2);
     print('bo3 last 3 games', odds.staticP.bo3.lengths.g3, odds.dynamicP.bo3.lengths.g3);
     print('bo5 win', odds.staticP.bo5.win, odds.dynamicP.bo5.win);

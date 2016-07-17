@@ -152,5 +152,10 @@ Snake IMay 0
 Snake IMay 0
 NB WE 0
 NB WE 0
-# week not done
+SAT RNG 0
+SAT RNG 0
+GT OMG 0
+GT OMG 0
+iG LGD 0
+iG LGD 0
 end

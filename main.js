@@ -238,6 +238,43 @@ lineReader.on('close', function() {
             });
             write();
         }
+
+
+        stateData.weeks.forEach(function(week) {
+            week.forEach(function(match) {
+                var p1 = pool.players[match.player1];
+                var p2 = pool.players[match.player2];
+                var r1 = pool.players[match.player1].player.getRating();
+                var r2 = pool.players[match.player2].player.getRating();
+                p1.w = p1.w === undefined ? 0 : p1.w;
+                p2.w = p2.w === undefined ? 0 : p2.w;
+                p1.total = p1.total === undefined ? 0 : p1.total;
+                p2.total = p2.total === undefined ? 0 : p2.total;
+                p1.d1 = p1.d1 === undefined ? 0 : p1.d1;
+                p2.d1 = p2.d1 === undefined ? 0 : p2.d1;
+                p1.d2 = p1.d2 === undefined ? 0 : p1.d2;
+                p2.d2 = p2.d2 === undefined ? 0 : p2.d2;
+                if (r1 > r2) {
+                    p1.w += match.result;
+                    p2.w += match.result;
+                } else {
+                    p1.w += 1 - match.result;
+                    p2.w += 1 - match.result;
+                }
+                p1.d1 += Math.pow(ratingToWinRate(p1, p2) - match.result, 2);
+                p2.d1 += Math.pow(ratingToWinRate(p2, p1) - (1-match.result), 2);
+                p1.total++;
+                p2.total++;
+            });
+        });
+
+        write('**** Other ****');
+        // write(printf('%-8s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max'));
+        playersA.forEach(function(v, i) {
+            write(printf('%-8d %-8s %-8.1f %-3d %-3d %-8.4f %-8.4f', i + 1, v.name, v.player.getRating(), v.total, v.w, v.w / v.total,
+                Math.sqrt(v.d1 / v.total)));
+        });
+        write();
     });
 });
 

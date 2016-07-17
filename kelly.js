@@ -80,7 +80,7 @@ lineReader.on('close', function() {
         }
     });
 
-    var R = process.argv.length < 4 ? 0.5 : parseFloat(process.argv[3]);
+    var R = process.argv.length < 4 ? 25 : parseFloat(process.argv[3]);
     stateData.todo.forEach(function(item) {
         var o1 = parseFloat(item.estodd);
         var o2 = parseFloat(item.betodd) - 1;
@@ -122,7 +122,7 @@ lineReader.on('close', function() {
         console.log('k:                      ' + item.k);
         console.log('bet:                    ' + Math.round(capital * item.k));
         console.log('adjusted bet:           ' + Math.round(capital * item.k * R));
-        var bet = Math.round(capital * item.k * R / 25) * 25;
+        var bet = Math.round(capital * item.k * 0.5 / R) * R;
         capital -= bet;
         console.log('adjusted bet (rounded): ' + bet);
         console.log('remaining capital:      ' + capital);
