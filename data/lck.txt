@@ -149,5 +149,11 @@ JAG KT 0
 # JAG KT 1 teemo pick = not really game
 MVP AFs 0
 MVP AFs 0
+ROX SSG 1
+SSG ROX 0
+SSG ROX 0
+LZ Ever 1
+LZ Ever 1
+LZ Ever 0
 # week not done
 end
