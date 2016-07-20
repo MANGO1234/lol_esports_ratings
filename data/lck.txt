@@ -155,5 +155,9 @@ SSG ROX 0
 LZ Ever 1
 LZ Ever 1
 LZ Ever 0
-# week not done
+week
+LZ ROX 0
+LZ ROX 0
+KT MVP 1
+KT MVP 1
 end

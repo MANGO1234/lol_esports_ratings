@@ -1,144 +1,24 @@
-/*jslint
-    node: true, esversion: 6, loopfunc: true
-*/
-
-//node main.js na & node main.js na2 & node main.js eu & node main.js eu2 & node main.js lck & node main.js lck2 & node main.js lpl & node main.js lpl2
-
 'use strict';
-
-var league = {
-    na: {
-        data: 'data\\na_lcs.txt',
-        bo: 3,
-        out: 'out\\na_lcs.txt'
-    },
-    eu: {
-        data: 'data\\eu_lcs.txt',
-        bo: 2,
-        out: 'out\\eu_lcs.txt'
-    },
-    lck: {
-        data: 'data\\lck.txt',
-        bo: 3,
-        out: 'out\\lck.txt'
-    },
-    lpl: {
-        data: 'data\\lpl.txt',
-        bo: 3,
-        out: 'out\\lpl.txt'
-    },
-    lms: {
-        data: 'data\\lms.txt',
-        bo: 3,
-        out: 'out\\lms.txt'
-    },
-};
 
 var glicko2 = require('glicko2');
 var _ = require('lodash');
 var printf = require('printf');
 var fs = require('fs');
+var leagues = require('./data/leagues.js');
+var s = require('./glicko.js');
 
-var STANDBY = 0;
-var READING_TITLE = 1;
-var READING_WEEK = 2;
+var ratingToWinRate = s.ratingToWinRate;
 
-var state = STANDBY;
-var stateData = {};
-stateData.week = -1;
-stateData.weeks = [];
-
-if (!league[process.argv[2]]) {
-    throw new Error('Unknown league');
-}
-
-var lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream(league[process.argv[2]].data)
-});
-
-lineReader.on('line', function(line) {
-    if (line.charAt(0) == '#') {} else if (state == STANDBY && line == 'start') {
-        state = READING_TITLE;
-        stateData.week = -1;
-    } else if (state == READING_TITLE) {
-        state = READING_WEEK;
-        stateData.name = line;
-    } else if (state == READING_WEEK) {
-        if (line == 'end') {
-            state = STANDBY;
-        } else if (line == 'week') {
-            stateData.week++;
-        } else if (line != 'week') {
-            stateData.weeks[stateData.week] = stateData.weeks[stateData.week] || [];
-            var k = line.split(' ');
-            stateData.weeks[stateData.week].push({
-                player1: k[0],
-                player2: k[1],
-                result: k[2] === '0' ? 0 : k[2] === '1' ? 1 : k[2] === '0.5' ? 0.5 : 'NA',
-            });
-        }
-    }
-});
-
-function getPool(stateData) {
-    var ranking = new glicko2.Glicko2({
-        tau: 0.5,
-        rating: 1500,
-        rd: 200,
-        vol: 0.06
-    });
-
-    var players = {};
-    var weeksUsed = [];
-
-    function getPlayer(name) {
-        if (!players[name]) {
-            players[name] = {
-                name: name,
-                player: ranking.makePlayer(),
-                history: {}
-            };
-        }
-        return players[name].player;
-    }
-
-    for (var i = 0; i < stateData.weeks.length; i++) {
-        var matches = stateData.weeks[i].map((datum) => {
-            return [getPlayer(datum.player1), getPlayer(datum.player2), datum.result];
-        });
-        ranking.updateRatings(matches);
-        weeksUsed.push(i);
-        _.values(players).forEach((player) => {
-            player.history[i] = {
-                rating: player.player.getRating(),
-                rd: player.player.getRd(),
-                vol: player.player.getVol()
-            };
-        });
-    }
-
-    return {
-        ranking: ranking,
-        players: players,
-        weeksUsed: weeksUsed
-    };
-}
-
-function ratingToWinRate(p1, p2) {
-    return 1 / (1 + Math.pow(10, (p2.player.getRating() - p1.player.getRating()) / 400));
-}
-
-lineReader.on('close', function() {
-    var pool = getPool(stateData);
-    var players = pool.players;
-    var weeksUsed = pool.weeksUsed;
+s.readData(process.argv[2]).then(s.dataToModel).then(function(model) {
+    var players = model.players;
+    var weeksUsed = model.weeksUsed;
 
     var playersA = _.values(players);
     playersA.sort(function(v1, v2) {
         return v2.player.getRating() - v1.player.getRating();
     });
 
-    var stream = fs.createWriteStream(league[process.argv[2]].out);
+    var stream = fs.createWriteStream(leagues[process.argv[2]].out);
     stream.once('open', function() {
         function write(s) {
             if (s !== undefined && s !== '') {
@@ -150,7 +30,7 @@ lineReader.on('close', function() {
             stream.write('\n');
         }
 
-        write('******** ' + stateData.name + ' ********');
+        write('******** ' + model.data.name + ' ********');
         write('**** Current Ratings ****');
         write(printf('%-8s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max'));
         playersA.forEach(function(v, i) {
@@ -190,7 +70,7 @@ lineReader.on('close', function() {
         });
         write();
 
-        if (league[process.argv[2]].bo == 2) {
+        if (leagues[process.argv[2]].bo == 2) {
             write('**** Estimated Win Rates (BO2) ****');
             formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
             write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
@@ -226,7 +106,7 @@ lineReader.on('close', function() {
                 })));
             });
             write();
-        } else if (league[process.argv[2]].bo === 3) {
+        } else if (leagues[process.argv[2]].bo === 3) {
             write('**** Estimated Win Rates (BO3) ****');
             formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
             write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
@@ -240,20 +120,20 @@ lineReader.on('close', function() {
             write();
         }
 
-        function score(r,w) {
+        function score(r, w) {
             if (r == 1) {
-                return w-0.5;
+                return w - 0.5;
             } else {
-                return 0.5-w;
+                return 0.5 - w;
             }
         }
 
-        stateData.weeks.forEach(function(week) {
+        model.data.weeks.forEach(function(week) {
             week.forEach(function(match) {
-                var p1 = pool.players[match.player1];
-                var p2 = pool.players[match.player2];
-                var r1 = pool.players[match.player1].player.getRating();
-                var r2 = pool.players[match.player2].player.getRating();
+                var p1 = model.players[match.player1];
+                var p2 = model.players[match.player2];
+                var r1 = model.players[match.player1].player.getRating();
+                var r2 = model.players[match.player2].player.getRating();
                 p1.w = p1.w === undefined ? 0 : p1.w;
                 p2.w = p2.w === undefined ? 0 : p2.w;
                 p1.total = p1.total === undefined ? 0 : p1.total;
