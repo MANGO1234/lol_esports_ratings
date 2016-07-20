@@ -6,7 +6,7 @@ var fs = require('fs');
 var cheerio = require('cheerio');
 var request = require('request');
 var rp = require('request-promise');
-var leagues = require('./leagues.js');
+var leagues = require('./matches/leagues.js');
 
 var l = process.argv[2];
 var t = process.argv.length > 3 ? process.argv[3] : leagues[l].current;
@@ -22,8 +22,16 @@ function scrape(l, t) {
                 var c = $(data[i]).find('td');
                 var match = {};
                 match.date = $(c[0]).text().slice(0, -1);
-                match.p1 = $(c[2]).find('a').text();
-                match.p2 = $(c[3]).find('a').text();
+                match.t1 = {};
+                match.t1.name = $(c[2]).find('a').text();
+                match.t1.bans = $(c[5]).text().slice(0, -1).split(', ');
+                match.t1.picks = $(c[7]).text().slice(0, -1).split(', ');
+                match.t1.players = $(c[9]).find('a').map((i, el) => $(el).text()).get();
+                match.t2 = {};
+                match.t2.name = $(c[3]).find('a').text();
+                match.t2.bans = $(c[6]).text().slice(0, -1).split(', ');
+                match.t2.picks = $(c[8]).text().slice(0, -1).split(', ');
+                match.t2.players = $(c[10]).find('a').map((i, el) => $(el).text()).get();
                 match.result = $(c[4]).text().slice(0, -1);
                 if (match.result == 'red') {
                     match.result = 0;
@@ -42,7 +50,7 @@ function scrape(l, t) {
 
     return Promise.all(k).then(function(arr) {
         return new Promise(function(resolve, reject) {
-            fs.writeFile('data2/' + l + t + '.json', JSON.stringify(arr, null, 4), function(e) {
+            fs.writeFile('matches/' + l + t + '.json', JSON.stringify(arr, null, 4), function(e) {
                 if (e) {
                     reject(e);
                 } else {
@@ -53,8 +61,8 @@ function scrape(l, t) {
     });
 }
 
+var c = Promise.resolve();
 if (l === 'all') {
-    var c = Promise.resolve();
     _.forEach(leagues, function(league, l) {
         _.forEach(league.tournaments, function(tourney, t) {
             c = c.then(function() {
@@ -63,5 +71,8 @@ if (l === 'all') {
         });
     });
 } else {
-    scrape(l, t);
+    c = scrape(l, t);
 }
+c.catch(function(e) {
+    console.log(e);
+});
