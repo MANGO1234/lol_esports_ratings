@@ -1,7 +1,3 @@
-/*jslint
-    node: true, esversion: 6, loopfunc: true
-*/
-
 'use strict';
 
 var glicko2 = require('glicko2');

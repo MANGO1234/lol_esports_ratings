@@ -1,7 +1,3 @@
-/*jslint
-    node: true, esversion: 6, loopfunc: true
-*/
-
 'use strict';
 
 var bo2s = [
@@ -10,6 +6,7 @@ var bo2s = [
     [1, 0],
     [1, 1]
 ];
+
 var bo3s = [
     [0, 0, 0],
     [0, 0, 1],
@@ -20,6 +17,7 @@ var bo3s = [
     [1, 1, 0],
     [1, 1, 1]
 ];
+
 var bo5s = [
     [0, 0, 0, 0, 0],
     [0, 0, 0, 0, 1],
@@ -55,136 +53,19 @@ var bo5s = [
     [1, 1, 1, 1, 1]
 ];
 
-var league = {
-    na: {
-        data: 'data\\na_lcs.txt',
-        bo: 3,
-        out: 'out\\na_lcs.txt'
-    },
-    eu: {
-        data: 'data\\eu_lcs.txt',
-        bo: 2,
-        out: 'out\\eu_lcs.txt'
-    },
-    lck: {
-        data: 'data\\lck.txt',
-        bo: 3,
-        out: 'out\\lck.txt'
-    },
-    lpl: {
-        data: 'data\\lpl.txt',
-        bo: 3,
-        out: 'out\\lpl.txt'
-    },
-    lms: {
-        data: 'data\\lms.txt',
-        bo: 3,
-        out: 'out\\lms.txt'
-    },
-};
-
 var glicko2 = require('glicko2');
 var _ = require('lodash');
 var printf = require('printf');
-var fs = require('fs');
+var s = require('./glicko.js');
 
-var STANDBY = 0;
-var READING_TITLE = 1;
-var READING_WEEK = 2;
+var ratingToWinRate = s.ratingToWinRate;
 
-var state = STANDBY;
-var stateData = {};
-stateData.week = -1;
-stateData.weeks = [];
+s.readData(process.argv[2]).then(s.dataToModel).then(function(model) {
+    var players = model.players;
+    var weeksUsed = model.weeksUsed;
 
-if (!league[process.argv[2]]) {
-    throw new Error('Unknown league');
-}
-
-var lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream(league[process.argv[2]].data)
-});
-
-lineReader.on('line', function(line) {
-    if (line.charAt(0) == '#') {} else if (state == STANDBY && line == 'start') {
-        state = READING_TITLE;
-        stateData.week = -1;
-    } else if (state == READING_TITLE) {
-        state = READING_WEEK;
-        stateData.name = line;
-    } else if (state == READING_WEEK) {
-        if (line == 'end') {
-            state = STANDBY;
-        } else if (line == 'week') {
-            stateData.week++;
-        } else if (line != 'week') {
-            stateData.weeks[stateData.week] = stateData.weeks[stateData.week] || [];
-            var k = line.split(' ');
-            stateData.weeks[stateData.week].push({
-                player1: k[0],
-                player2: k[1],
-                result: k[2] === '0' ? 0 : k[2] === '1' ? 1 : k[2] === '0.5' ? 0.5 : 'NA',
-            });
-        }
-    }
-});
-
-
-function getPool(stateData) {
-    var ranking = new glicko2.Glicko2({
-        tau: 0.5,
-        rating: 1500,
-        rd: 200,
-        vol: 0.06
-    });
-
-    var players = {};
-    var weeksUsed = [];
-
-    function getPlayer(name) {
-        if (!players[name]) {
-            players[name] = {
-                name: name,
-                player: ranking.makePlayer(),
-                history: {}
-            };
-        }
-        return players[name].player;
-    }
-
-    for (var i = 0; i < stateData.weeks.length; i++) {
-        var matches = stateData.weeks[i].map((datum) => {
-            return [getPlayer(datum.player1), getPlayer(datum.player2), datum.result];
-        });
-        ranking.updateRatings(matches);
-        weeksUsed.push(i);
-        _.values(players).forEach((player) => {
-            player.history[i] = {
-                rating: player.player.getRating(),
-                rd: player.player.getRd(),
-                vol: player.player.getVol()
-            };
-        });
-    }
-
-    return {
-        ranking: ranking,
-        players: players,
-        weeksUsed: weeksUsed
-    };
-}
-
-function ratingToWinRate(p1, p2) {
-    return 1 / (1 + Math.pow(10, (p2.player.getRating() - p1.player.getRating()) / 400));
-}
-
-lineReader.on('close', function() {
-    var pool = getPool(stateData);
-    var players = pool.players;
-    var weeksUsed = pool.weeksUsed;
-
-    var p1 = pool.players[process.argv[3]];
-    var p2 = pool.players[process.argv[4]];
+    var p1 = model.players[process.argv[3]];
+    var p2 = model.players[process.argv[4]];
     if (!(p1 && p2)) {
         throw new Error('Unknown players');
     }
@@ -199,19 +80,19 @@ lineReader.on('close', function() {
     }
 
     function winLoseCount(a) {
-        var upto = (a.length-1)/2+1;
+        var upto = (a.length - 1) / 2 + 1;
         var w = 0;
         var l = 0;
         for (var i = 0; w < upto && l < upto; i++) {
             w += a[i];
-            l += 1-a[i];
+            l += 1 - a[i];
         }
         return [w, l];
     }
 
     function wlCountKey(a) {
         var c = winLoseCount(a);
-        return 'w'+c[0]+'x'+c[1];
+        return 'w' + c[0] + 'x' + c[1];
     }
 
     function staticP(p, a) {
@@ -223,15 +104,15 @@ lineReader.on('close', function() {
     }
 
     function dynamicP(a) {
-        var pool = getPool(stateData);
-        var players = pool.players;
-        var p1 = pool.players[process.argv[3]];
-        var p2 = pool.players[process.argv[4]];
+        var data = s.dataToModel(model.data);
+        var players = data.players;
+        var p1 = data.players[process.argv[3]];
+        var p2 = data.players[process.argv[4]];
         var c = 1;
         for (var i = 0; i < a.length; i++) {
             var p = ratingToWinRate(p1, p2);
             c *= a[i] === 1 ? p : 1 - p;
-            pool.ranking.updateRatings([
+            data.ranking.updateRatings([
                 [p1.player, p2.player, a[i]]
             ]);
         }
@@ -253,8 +134,8 @@ lineReader.on('close', function() {
         o.bo2.win = counts[2];
         o.bo2.draw = counts[1];
         o.bo2.lose = counts[0];
-        o.bo2.notWin = o.lose+o.draw;
-        o.bo2.notLose = o.win+o.draw;
+        o.bo2.notWin = o.lose + o.draw;
+        o.bo2.notLose = o.win + o.draw;
 
         var results = {};
         for (let i = 0; i < bo3s.length; i++) {
@@ -267,10 +148,10 @@ lineReader.on('close', function() {
         o.bo3.lose = 1 - o.bo3.win;
         o.bo3.results = results;
         o.bo3.lengths = {};
-        o.bo3.lengths.g2 = results.w2x0+results.w0x2;
-        o.bo3.lengths.g3 = results.w2x1+results.w1x2;
-        o.bo3.lengths.w1 = results.w2x1+results.w1x2+results.w0x2;
-        o.bo3.lengths.w2 = results.w1x2+results.w2x1+results.w2x0;
+        o.bo3.lengths.g2 = results.w2x0 + results.w0x2;
+        o.bo3.lengths.g3 = results.w2x1 + results.w1x2;
+        o.bo3.lengths.w1 = results.w2x1 + results.w1x2 + results.w0x2;
+        o.bo3.lengths.w2 = results.w1x2 + results.w2x1 + results.w2x0;
 
         results = {};
         for (let i = 0; i < bo5s.length; i++) {
@@ -283,9 +164,9 @@ lineReader.on('close', function() {
         o.bo5.lose = 1 - o.bo5.win;
         o.bo5.results = results;
         o.bo5.lengths = {};
-        o.bo5.lengths.g3 = results.w3x0+results.w0x3;
-        o.bo5.lengths.g4 = results.w3x1+results.w1x3;
-        o.bo5.lengths.g5 = results.w3x2+results.w2x3;
+        o.bo5.lengths.g3 = results.w3x0 + results.w0x3;
+        o.bo5.lengths.g4 = results.w3x1 + results.w1x3;
+        o.bo5.lengths.g5 = results.w3x2 + results.w2x3;
 
         return o;
     }
@@ -329,4 +210,6 @@ lineReader.on('close', function() {
     print('bo5 last 3 games', odds.staticP.bo5.lengths.g3, odds.dynamicP.bo5.lengths.g3);
     print('bo5 last 4 games', odds.staticP.bo5.lengths.g4, odds.dynamicP.bo5.lengths.g4);
     print('bo5 last 5 games', odds.staticP.bo5.lengths.g5, odds.dynamicP.bo5.lengths.g5);
+}).catch(function(e) {
+    console.log(e);
 });

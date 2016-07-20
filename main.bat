@@ -1,0 +1,1 @@
+node main.js na & node main.js eu & node main.js lck & node main.js lpl & node main.js lms

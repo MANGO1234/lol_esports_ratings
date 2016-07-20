@@ -1,7 +1,3 @@
-/*jslint
-    node: true, esversion: 6, loopfunc: true
-*/
-
 'use strict';
 
 var _ = require('lodash');
@@ -44,17 +40,28 @@ function scrape(l, t) {
         });
     });
 
-    Promise.all(k).then(function(arr) {
-        fs.writeFile('data2/' + l + t + '.json', JSON.stringify(arr, null, 4), function(e) {
-            if (e) {
-                console.log(e);
-            }
+    return Promise.all(k).then(function(arr) {
+        return new Promise(function(resolve, reject) {
+            fs.writeFile('data2/' + l + t + '.json', JSON.stringify(arr, null, 4), function(e) {
+                if (e) {
+                    reject(e);
+                } else {
+                    resolve(e);
+                }
+            });
         });
     });
 }
 
 if (l === 'all') {
-
+    var c = Promise.resolve();
+    _.forEach(leagues, function(league, l) {
+        _.forEach(league.tournaments, function(tourney, t) {
+            c = c.then(function() {
+                return scrape(l, t);
+            });
+        });
+    });
 } else {
     scrape(l, t);
 }
