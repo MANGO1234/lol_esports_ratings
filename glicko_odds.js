@@ -56,7 +56,7 @@ var bo5s = [
 var glicko2 = require('glicko2');
 var _ = require('lodash');
 var printf = require('printf');
-var s = require('./glicko.js');
+var s = require('./glicko_shared.js');
 
 var ratingToWinRate = s.ratingToWinRate;
 
