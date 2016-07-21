@@ -56,8 +56,8 @@ function readData(league) {
     });
 }
 
-function dataToModel(data) {
-    var ranking = new glicko2.Glicko2({
+function dataToModel(data, params) {
+    var ranking = new glicko2.Glicko2(params || {
         tau: 0.5,
         rating: 1500,
         rd: 200,
@@ -105,8 +105,13 @@ function ratingToWinRate(p1, p2) {
     return 1 / (1 + Math.pow(10, (p2.player.getRating() - p1.player.getRating()) / 400));
 }
 
+function ratingToWinRate2(p1, p2) {
+    return 1 / (1 + Math.pow(10, (p2.getRating() - p1.getRating()) / 400));
+}
+
 module.exports = {
     readData: readData,
     dataToModel: dataToModel,
     ratingToWinRate: ratingToWinRate,
+    ratingToWinRate2: ratingToWinRate2
 };
