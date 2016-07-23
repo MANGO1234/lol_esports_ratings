@@ -134,8 +134,8 @@ s.readData(process.argv[2]).then(s.dataToModel).then(function(model) {
         o.bo2.win = counts[2];
         o.bo2.draw = counts[1];
         o.bo2.lose = counts[0];
-        o.bo2.notWin = o.lose + o.draw;
-        o.bo2.notLose = o.win + o.draw;
+        o.bo2.notWin = o.bo2.lose + o.bo2.draw;
+        o.bo2.notLose = o.bo2.win + o.bo2.draw;
 
         var results = {};
         for (let i = 0; i < bo3s.length; i++) {
@@ -182,12 +182,12 @@ s.readData(process.argv[2]).then(s.dataToModel).then(function(model) {
     console.log(printf('%-20s %-12s %-12s %-12s %-12s', 'Type', 'Stat (O)', 'Dyna (O)', 'Stat (%)', 'Dyna (%)'));
     print('bo1 win', odds.staticP.bo1.win, odds.dynamicP.bo1.win);
     print('bo1 lose', odds.staticP.bo1.lose, odds.dynamicP.bo1.lose);
-    if (process.argv == 'eu' && process.argv == 'eu2') {
+    if (process.argv[2] == 'eu' || process.argv[2] == 'eu2') {
         print('bo2 win', odds.staticP.bo2.win, odds.dynamicP.bo2.win);
         print('bo2 lose', odds.staticP.bo2.lose, odds.dynamicP.bo2.lose);
         print('bo2 draw', odds.staticP.bo2.draw, odds.dynamicP.bo2.draw);
         print('bo2 not win', odds.staticP.bo2.notWin, odds.dynamicP.bo2.notWin);
-        print('bo2 not lose', odds.staticP.bo2.notLose, odds.dynamicP.notLose);
+        print('bo2 not lose', odds.staticP.bo2.notLose, odds.dynamicP.bo2.notLose);
     }
     print('bo3 win', odds.staticP.bo3.win, odds.dynamicP.bo3.win);
     print('bo3 lose', odds.staticP.bo3.lose, odds.dynamicP.bo3.lose);
