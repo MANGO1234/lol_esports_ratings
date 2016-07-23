@@ -32,10 +32,10 @@ s.readData(process.argv[2]).then(s.dataToModel).then(function(model) {
 
         write('******** ' + model.data.name + ' ********');
         write('**** Current Ratings ****');
-        write(printf('%-8s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max'));
+        write(printf('%-8s %-8s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max', 'Vol'));
         playersA.forEach(function(v, i) {
-            write(printf('%-8d %-8s %-8.1f %-8.1f %-8.1f %-8.1f', i + 1, v.name, v.player.getRating(), v.player.getRd() * 2,
-                v.player.getRating() - v.player.getRd() * 2, v.player.getRating() + v.player.getRd() * 2));
+            write(printf('%-8d %-8s %-8.1f %-8.1f %-8.1f %-8.1f %-8.5f', i + 1, v.name, v.player.getRating(), v.player.getRd() * 2,
+                v.player.getRating() - v.player.getRd() * 2, v.player.getRating() + v.player.getRd() * 2, v.player.getVol()));
         });
         write();
         var ratingsA = playersA.map((p) => p.player.getRating());
