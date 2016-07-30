@@ -175,4 +175,12 @@ NB EDG 0
 GT Snake 0
 GT Snake 1
 GT Snake 0
+IMay LGD 1
+IMay LGD 1
+OMG WE 0
+OMG WE 1
+OMG WE 0
+VG RNG 1
+VG RNG 0
+VG RNG 0
 end

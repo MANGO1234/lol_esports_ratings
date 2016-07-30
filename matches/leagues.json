@@ -1,0 +1,82 @@
+{
+    "tournaments": {
+        "na16br": {
+            "title": "NA 2016 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:NA%20LCS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "eu16br": {
+            "title": "EU 2016 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 2,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:EU%20LCS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lck15ar": {
+            "title": "LCK 2015 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:Champions%202015%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lck15ap": {
+            "title": "LCK 2015 Spring Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:Champions%202015%20Spring%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lck15br": {
+            "title": "LCK 2015 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:Champions%202015%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lck15bp": {
+            "title": "LCK 2015 Summer Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:Champions%202015%20Summer%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lck16ar": {
+            "title": "LCK 2016 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202016%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lck16ap": {
+            "title": "LCK 2016 Spring Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202016%20Spring%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lck16br": {
+            "title": "LCK 2016 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lpl16br": {
+            "title": "LPL 2016 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lms16br": {
+            "title": "LMS 2016 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 2,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LMS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        }
+    },
+    "combined": {
+        "all": ["lck15a", "lck15b", "lck16a", "lck", "na", "eu", "lpl", "lms"],
+        "new": ["na16br", "eu16br", "lck16br", "lpl16br", "lms16br"],
+        "na": ["na16br"],
+        "eu": ["eu16br"],
+        "lck15a": ["lck15ar", "lck15ap"],
+        "lck15b": ["lck15br", "lck15bp"],
+        "lck16a": ["lck16ar", "lck16ap"],
+        "lck": ["lck16br"],
+        "lpl": ["lpl16br"],
+        "lms": ["lms16br"]
+    }
+}

@@ -1,0 +1,16 @@
+name: lol_ratings
+dependencies:
+- pip=8.1.2=py34_0
+- python=3.4.5=0
+- requests=2.10.0=py34_0
+- setuptools=23.0.0=py34_0
+- vs2010_runtime=10.00.40219.1=2
+- wheel=0.29.0=py34_0
+- pip:
+  - cssselect==0.9.2
+  - lxml==3.6.0
+  - pyquery==1.2.13
+  - six==1.10.0
+  - trueskill==0.4.4
+prefix: C:\Miniconda3\envs\lol_ratings
+
