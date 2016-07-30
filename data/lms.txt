@@ -1,4 +1,5 @@
 start
+LMS
 week
 JTeam Machi 1
 JTeam Machi 0
@@ -56,4 +57,27 @@ XG ahq 0
 XG ahq 0
 HKE Mist 1
 HKE Mist 1
+JTeam FW 1
+JTeam FW 1
+Machi MS 1
+Machi MS 0
+HKE ahq 0
+HKE ahq 0
+Mist MS 0
+Mist MS 0
+Machi XG 1
+Machi XG 0
+FW JTeam 1
+FW JTeam 0
+week
+Machi JTeam 0
+Machi JTeam 0
+FW MS 1
+FW MS 1
+XG JTeam 0
+XG JTeam 0
+ahq Mist 1
+ahq Mist 1
+HKE FW 1
+HKE FW 0
 end

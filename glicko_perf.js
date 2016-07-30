@@ -43,6 +43,7 @@ s.readData(process.argv[2]).then(function(data) {
         ngames: 0,
         correct: 0,
         score: 0,
+        score2: 0,
     };
     for (let i = 3; i < data.weeks.length; i++) {
         let ps = getPlayers(i - 1);
@@ -56,11 +57,13 @@ s.readData(process.argv[2]).then(function(data) {
                 ngames: 0,
                 correct: 0,
                 score: 0,
+                score2: 0,
             };
             p2.predictions[0] = p2.predictions[0] ? p2.predictions[0] : {
                 ngames: 0,
                 correct: 0,
                 score: 0,
+                score2: 0,
             };
 
             p1.predictions[0].ngames++;
@@ -82,6 +85,9 @@ s.readData(process.argv[2]).then(function(data) {
                 p2.predictions[0].score += 1 + log2(1 - w);
                 overall[0].score += 1 + log2(1 - w);
             }
+            p1.predictions[0].score2 += (datum.result - w) * (datum.result - w);
+            p2.predictions[0].score2 += ((1 - datum.result) - (1 - w)) * ((1 - datum.result) - (1 - w));
+            overall[0].score2 += (datum.result - w) * (datum.result - w);
         });
     }
 
@@ -89,6 +95,7 @@ s.readData(process.argv[2]).then(function(data) {
         ngames: 0,
         correct: 0,
         score: 0,
+        score2: 0,
     };
     for (let i = 3; i < data.weeks.length; i++) {
         for (let j = 0; j < data.weeks[i].length; j++) {
@@ -107,11 +114,13 @@ s.readData(process.argv[2]).then(function(data) {
                 ngames: 0,
                 correct: 0,
                 score: 0,
+                score2: 0,
             };
             p2.predictions[1] = p2.predictions[1] ? p2.predictions[1] : {
                 ngames: 0,
                 correct: 0,
                 score: 0,
+                score2: 0,
             };
 
             p1.predictions[1].ngames++;
@@ -133,6 +142,9 @@ s.readData(process.argv[2]).then(function(data) {
                 p2.predictions[1].score += 1 + log2(1 - w);
                 overall[1].score += 1 + log2(1 - w);
             }
+            p1.predictions[1].score2 += (datum.result - w) * (datum.result - w);
+            p2.predictions[1].score2 += ((1 - datum.result) - (1 - w)) * ((1 - datum.result) - (1 - w));
+            overall[1].score2 += (datum.result - w) * (datum.result - w);
         }
     }
 
@@ -140,6 +152,7 @@ s.readData(process.argv[2]).then(function(data) {
         ngames: 0,
         correct: 0,
         score: 0,
+        score2: 0,
     };
     ranking = new glicko2.Glicko2({
         tau: 0.5,
@@ -158,11 +171,13 @@ s.readData(process.argv[2]).then(function(data) {
                 ngames: 0,
                 correct: 0,
                 score: 0,
+                score2: 0,
             };
             p2.predictions[2] = p2.predictions[2] ? p2.predictions[2] : {
                 ngames: 0,
                 correct: 0,
                 score: 0,
+                score2: 0,
             };
 
             p1.predictions[2].ngames++;
@@ -184,6 +199,9 @@ s.readData(process.argv[2]).then(function(data) {
                 p2.predictions[2].score += 1 + log2(1 - w);
                 overall[2].score += 1 + log2(1 - w);
             }
+            p1.predictions[2].score2 += (datum.result - w) * (datum.result - w);
+            p2.predictions[2].score2 += ((1 - datum.result) - (1 - w)) * ((1 - datum.result) - (1 - w));
+            overall[2].score2 += (datum.result - w) * (datum.result - w);
             ranking.updateRatings([
                 [ps[datum.player1], ps[datum.player2], datum.result]
             ]);
@@ -199,9 +217,9 @@ s.readData(process.argv[2]).then(function(data) {
 
     console.log(printf('%-8s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max'));
     playersA.forEach(function(v, i) {
-        console.log(printf('%-8d %-8s %-8.1f %-3d %-3d %-8.4f %-8.4f %-3d %-3d %-8.4f %-8.4f', i + 1, v.name, v.player.getRating(),
-            v.predictions[0].ngames, v.predictions[0].correct, v.predictions[0].correct / v.predictions[0].ngames * 100, v.predictions[0].score,
-            v.predictions[1].ngames, v.predictions[1].correct, v.predictions[1].correct / v.predictions[1].ngames * 100, v.predictions[1].score
+        console.log(printf('%-8d %-8s %-8.1f %-3d %-3d %-8.4f %-8.4f %-8.4f %-3d %-3d %-8.4f %-8.4f %-8.4f', i + 1, v.name, v.player.getRating(),
+            v.predictions[0].ngames, v.predictions[0].correct, v.predictions[0].correct / v.predictions[0].ngames * 100, v.predictions[0].score / v.predictions[0].ngames, v.predictions[0].score2 / v.predictions[0].ngames,
+            v.predictions[1].ngames, v.predictions[1].correct, v.predictions[1].correct / v.predictions[1].ngames * 100, v.predictions[1].score / v.predictions[1].ngames, v.predictions[1].score2 / v.predictions[1].ngames
         ));
     });
     console.log();
@@ -211,16 +229,19 @@ s.readData(process.argv[2]).then(function(data) {
     console.log("Model 1 Correct Predictions: " + overall[0].correct);
     console.log("Model 1 Correct %: " + overall[0].correct / overall[0].ngames * 100);
     console.log("Model 1 Score: " + overall[0].score);
+    console.log("Model 1 Score2: " + overall[0].score2 / overall[0].ngames);
 
     console.log("Model 2 # Games: " + overall[1].ngames);
     console.log("Model 2 Correct Predictions: " + overall[1].correct);
     console.log("Model 2 Correct %: " + overall[1].correct / overall[1].ngames * 100);
     console.log("Model 2 Score: " + overall[1].score);
+    console.log("Model 2 Score2: " + overall[1].score2 / overall[1].ngames);
 
     console.log("Model 3 # Games: " + overall[2].ngames);
     console.log("Model 3 Correct Predictions: " + overall[2].correct);
     console.log("Model 3 Correct %: " + overall[2].correct / overall[2].ngames * 100);
     console.log("Model 3 Score: " + overall[2].score);
+    console.log("Model 3 Score2: " + overall[2].score2 / overall[2].ngames);
 }).catch(function(e) {
     console.log(e);
 });
