@@ -74,7 +74,6 @@
         }
     },
     "combined": {
-        "all": ["lck15a", "lck15b", "lck16a", "lck", "na", "eu", "lpl", "lms"],
         "new": ["na16br", "eu16br", "lck16br", "lpl16br", "lms16br"],
         "na": ["na16br"],
         "eu": ["eu16br"],
