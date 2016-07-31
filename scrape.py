@@ -2,7 +2,6 @@ import json
 import sys
 from pyquery import PyQuery as pq
 import _sqlite3 as sql
-from pprint import pprint
 
 with open('matches/leagues.json') as data_file:
     config = json.load(data_file)
@@ -12,22 +11,22 @@ if key in config["tournaments"]:
     ts = [key]
 elif key in config["combined"]:
     ts = config["combined"][key]
-
+elif key == 'all':
+    ts=list(config['tournaments'].keys())
 
 conn = sql.connect('matches/matchess.db')
 db = conn.cursor()
 
 matches = []
 for league in ts:
-    pprint(config["tournaments"])
+    print('retrieving ' + league)
     v = config["tournaments"][league]
-    pprint("Getting " + league)
     d = pq(url=v["link"])
     data = d('.wikitable tr')
     for i in range(2, data.length - 1):
         c = d(data[i]).find('td')
         date = d(c[0]).text()
-        patch = d(c[1]).text()[0:-1]
+        patch = d(c[1]).text() if d(c[1]).text() != '-' else ''
         t1 = d(c[2]).find('a').text()
         t2 = d(c[3]).find('a').text()
         result = d(c[4]).text()
@@ -80,8 +79,6 @@ for league in ts:
             t2c1, t2c2, t2c3, t2c4, t2c5
         ))
 
-pprint(matches)
-
 db.execute('''create table if not exists matches
              (
              league text, id int, date text, patch text, t1 text, t2 text, result int, link text
@@ -93,5 +90,9 @@ db.execute('''create table if not exists matches
              , t2c1 text, t2c2 text, t2c3 text, t2c4 text, t2c5 text
              , primary key (id, league)
              )''')
+
+db.execute('DELETE FROM matches WHERE league in ("'+'","'.join(ts)+'")')
+db.executemany('INSERT INTO matches VALUES (' + (33 * '?,') + '?)', matches)
+
 conn.commit()
 conn.close()
