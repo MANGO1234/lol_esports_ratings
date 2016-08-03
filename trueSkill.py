@@ -1,11 +1,26 @@
 import _sqlite3 as sql
+
+import math
 import trueskill as ts
-import pandas as pd
+import sys
+import json
 
 conn = sql.connect('matches/matchess.db')
 conn.row_factory = sql.Row
 db = conn.cursor()
-ms = list(map(dict, list(db.execute("select * from matches where league='na16br' order by id"))))
+
+with open('matches/leagues.json') as data_file:
+    config = json.load(data_file)
+
+key = sys.argv[1]
+if key in config["tournaments"]:
+    teams = [key]
+elif key in config["combined"]:
+    teams = config["combined"][key]
+elif key == 'all':
+    teams = list(config['tournaments'].keys())
+
+ms = list(map(dict, list(db.execute("select * from matches where league in ('" + "','".join(teams) + "') order by id"))))
 conn.commit()
 conn.close()
 
@@ -58,15 +73,62 @@ for m in ms:
         , (t2p1, m["t2p1"], m["t2"]), (t2p2, m["t2p2"], m["t2"]), (t2p3, m["t2p3"], m["t2"]), (t2p4, m["t2p4"], m["t2"]), (t2p5, m["t2p5"], m["t2"])])
 
 i = 1
-print("{:3}  {:15}  {:25}  {:5}  {:8}  {:8}".format("", "Player", "Team", "Games", "Rating", "SD"))
-for p in sorted(players.values(), key=lambda x: x["rating"].mu, reverse=True):
-    print("{:3d}  {:15.15}  {:25.25}  {:<5d}  {:<8.4f}  {:<8.4f}".format(i, p["name"], p["team"], p["game"], p["rating"].mu, p["rating"].sigma))
-    i+=1
-print()
-
-i = 1
 print("{:15}  {:25}  {:5}  {:8}  {:8}".format("", "Player", "Team", "Games", "Rating", "SD"))
 for p in sorted(players.values(), key=lambda x: [x["team"], -x["rating"].mu]):
     print("{:3d}  {:15.15}  {:25.25}  {:<5d}  {:<8.4f}  {:<8.4f}".format(i, p["name"], p["team"], p["game"], p["rating"].mu, p["rating"].sigma))
-    i+=1
+    i += 1
 print()
+
+i = 1
+print("{:3}  {:15}  {:25}  {:5}  {:8}  {:8}".format("", "Player", "Team", "Games", "Rating", "SD"))
+for p in sorted(players.values(), key=lambda x: x["rating"].mu, reverse=True):
+    print("{:3d}  {:15.15}  {:25.25}  {:<5d}  {:<8.4f}  {:<8.4f}".format(i, p["name"], p["team"], p["game"], p["rating"].mu, p["rating"].sigma))
+    i += 1
+print()
+
+teams = {}
+
+
+def getTeam(n):
+    if not n in teams:
+        teams[n] = {
+            "name": n,
+            "rating": ts.Rating(),
+            "game": 0
+        }
+    return teams[n]
+
+
+def getTeamRatingAndIncrementGame(n):
+    p = getTeam(n)
+    p["game"] += 1
+    return p["rating"]
+
+def getTeamRating(n):
+    p = getTeam(n)
+    return p["rating"]
+
+
+def updateTeamRatings(rs):
+    for (r, n) in rs:
+        teams[n]["rating"] = r
+
+tempTs = ts.TrueSkill()
+def winRate(r1,r2):
+    return tempTs.cdf((r1.mu-r2.mu)/(25.0/6)/math.sqrt(2))
+
+for m in ms:
+    (t1,), (t2,) = ts.rate([(getTeamRatingAndIncrementGame(m["t1"]),), (getTeamRatingAndIncrementGame(m["t2"]),)], [1 - m["result"], m["result"]])
+    updateTeamRatings([(t1, m["t1"]), (t2, m["t2"])])
+
+i = 1
+print("{:3}  {:25}  {:5}  {:8}  {:8}".format("", "Team", "Games", "Rating", "SD"))
+tss=sorted(teams.values(), key=lambda x: x["rating"].mu, reverse=True)
+for p in tss:
+    print("{:3d}  {:25.25}  {:<5d}  {:<8.4f}  {:<8.4f}".format(i, p["name"], p["game"], p["rating"].mu, p["rating"].sigma))
+    i += 1
+print()
+
+for t1 in tss:
+    for t2 in tss:
+        print("{:25.25}  {:25.25}  {:<8.2f}".format(t1["name"], t2["name"], winRate(t1["rating"], t2["rating"])))

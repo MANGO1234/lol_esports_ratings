@@ -77,6 +77,7 @@
         "new": ["na16br", "eu16br", "lck16br", "lpl16br", "lms16br"],
         "na": ["na16br"],
         "eu": ["eu16br"],
+        "lcks": ["lck15ar", "lck15ap", "lck15br", "lck15bp", "lck16ar", "lck16ap"],
         "lck15a": ["lck15ar", "lck15ap"],
         "lck15b": ["lck15br", "lck15bp"],
         "lck16a": ["lck16ar", "lck16ap"],
