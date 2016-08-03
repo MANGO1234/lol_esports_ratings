@@ -183,4 +183,37 @@ OMG WE 0
 VG RNG 1
 VG RNG 0
 VG RNG 0
+GT EDG 0
+GT EDG 0
+SAT NB 1
+SAT NB 0
+SAT NB 0
+iG Snake 1
+iG Snake 0
+iG Snake 0
+week
+SAT iG 1
+SAT iG 0
+SAT iG 0
+GT NB 1
+GT NB 1
+IMay WE 1
+IMay WE 0
+IMay WE 0
+LGD VG 1
+LGD VG 1
+SAT EDG 0
+SAT EDG 0
+GT iG 0
+GT iG 0
+Snake NB 1
+Snake NB 1
+LGD WE 1
+LGD WE 1
+LGD WE 0
+IMay VG 0
+IMay VG 0
+OMG RNG 1
+OMG RNG 1
+OMG RNG 0
 end

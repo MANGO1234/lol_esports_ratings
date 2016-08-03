@@ -204,4 +204,13 @@ KT Ever 0
 MVP SSG 0
 MVP SSG 0
 MVP SSG 1
+CJ ROX 0
+CJ ROX 0
+week
+SSG AFs 1
+SSG AFs 1
+SSG AFs 0
+Ever CJ 1
+Ever CJ 0
+Ever CJ 0
 end
