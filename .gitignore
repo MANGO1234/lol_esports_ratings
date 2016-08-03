@@ -3,3 +3,5 @@ node_modules/
 .idea/
 matches/matchess.db
 *.iml
+query.py
+__pycache__/

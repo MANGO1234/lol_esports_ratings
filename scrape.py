@@ -19,6 +19,8 @@ db = conn.cursor()
 
 matches = []
 for league in ts:
+    if key == "all" and len(list(map(dict, list(db.execute("select * from matches where league='?' order by id", league))))) > 0:
+        continue
     print('retrieving ' + league)
     v = config["tournaments"][league]
     d = pq(url=v["link"])
