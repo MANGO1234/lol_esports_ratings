@@ -10,13 +10,13 @@
             "title": "NA 2016 Summer Split Regular Season",
             "type": "regular",
             "bo": 3,
-            "link": "http://lol.esportspedia.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:NA%20LCS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:NA%20LCS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
         },
         "eu16br": {
             "title": "EU 2016 Summer Split Regular Season",
             "type": "regular",
             "bo": 2,
-            "link": "http://lol.esportspedia.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:EU%20LCS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:EU%20LCS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
         },
         "lck15ar": {
             "title": "LCK 2015 Spring Split Regular Season",
@@ -58,19 +58,19 @@
             "title": "LCK 2016 Summer Split Regular Season",
             "type": "regular",
             "bo": 3,
-            "link": "http://lol.esportspedia.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
         },
         "lpl16br": {
             "title": "LPL 2016 Summer Split Regular Season",
             "type": "regular",
             "bo": 3,
-            "link": "http://lol.esportspedia.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
         },
         "lms16br": {
             "title": "LMS 2016 Summer Split Regular Season",
             "type": "regular",
             "bo": 2,
-            "link": "http://lol.esportspedia.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LMS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LMS%202016%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true"
         }
     },
     "combined": {
