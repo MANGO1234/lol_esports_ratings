@@ -15,12 +15,27 @@ elif key == 'all':
     ts=list(config['tournaments'].keys())
 
 conn = sql.connect('matches/matchess.db')
+conn.row_factory = sql.Row
 db = conn.cursor()
 
+db.execute('''create table if not exists matches
+             (
+             league text, id int, date text, patch text, t1 text, t2 text, result int, link text
+             , t1b1 text, t1b2 text, t1b3 text
+             , t2b1 text, t2b2 text, t2b3 text
+             , t1p1 text, t1p2 text, t1p3 text, t1p4 text, t1p5 text
+             , t2p1 text, t2p2 text, t2p3 text, t2p4 text, t2p5 text
+             , t1c1 text, t1c2 text, t1c3 text, t1c4 text, t1c5 text
+             , t2c1 text, t2c2 text, t2c3 text, t2c4 text, t2c5 text
+             , primary key (id, league)
+             )''')
+
 matches = []
+usedTs = []
 for league in ts:
-    if key == "all" and len(list(map(dict, list(db.execute("select * from matches where league='?' order by id", league))))) > 0:
+    if key == "all" and len(list(map(dict, list(db.execute("select * from matches where league=? order by id", (league,)))))) > 0:
         continue
+    usedTs.append(league)
     print('retrieving ' + league)
     v = config["tournaments"][league]
     d = pq(url=v["link"])
@@ -81,19 +96,7 @@ for league in ts:
             t2c1, t2c2, t2c3, t2c4, t2c5
         ))
 
-db.execute('''create table if not exists matches
-             (
-             league text, id int, date text, patch text, t1 text, t2 text, result int, link text
-             , t1b1 text, t1b2 text, t1b3 text
-             , t2b1 text, t2b2 text, t2b3 text
-             , t1p1 text, t1p2 text, t1p3 text, t1p4 text, t1p5 text
-             , t2p1 text, t2p2 text, t2p3 text, t2p4 text, t2p5 text
-             , t1c1 text, t1c2 text, t1c3 text, t1c4 text, t1c5 text
-             , t2c1 text, t2c2 text, t2c3 text, t2c4 text, t2c5 text
-             , primary key (id, league)
-             )''')
-
-db.execute('DELETE FROM matches WHERE league in ("'+'","'.join(ts)+'")')
+db.execute('DELETE FROM matches WHERE league in ("'+'","'.join(usedTs)+'")')
 db.executemany('INSERT INTO matches VALUES (' + (33 * '?,') + '?)', matches)
 
 conn.commit()
