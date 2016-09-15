@@ -37,6 +37,7 @@ function readData(league) {
                 if (line == 'end') {
                     state = STANDBY;
                 } else if (line == 'week') {
+                    data.weeks[data.week] = data.weeks[data.week] || [];
                     data.week++;
                 } else if (line != 'week') {
                     data.weeks[data.week] = data.weeks[data.week] || [];
