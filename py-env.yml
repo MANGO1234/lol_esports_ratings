@@ -13,4 +13,3 @@ dependencies:
   - six==1.10.0
   - trueskill==0.4.4
 prefix: C:\Miniconda3\envs\lol_ratings
-

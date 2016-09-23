@@ -1,9 +1,9 @@
 import _sqlite3 as sql
-
-import math
-import trueskill as ts
-import sys
 import json
+import math
+import sys
+
+import trueskill as ts
 
 conn = sql.connect('matches/matchess.db')
 conn.row_factory = sql.Row
@@ -104,6 +104,7 @@ def getTeamRatingAndIncrementGame(n):
     p["game"] += 1
     return p["rating"]
 
+
 def getTeamRating(n):
     p = getTeam(n)
     return p["rating"]
@@ -113,9 +114,13 @@ def updateTeamRatings(rs):
     for (r, n) in rs:
         teams[n]["rating"] = r
 
+
 tempTs = ts.TrueSkill()
-def winRate(r1,r2):
-    return tempTs.cdf((r1.mu-r2.mu)/(25.0/6)/math.sqrt(2))
+
+
+def winRate(r1, r2):
+    return tempTs.cdf((r1.mu - r2.mu) / (25.0 / 6) / math.sqrt(2))
+
 
 for m in ms:
     (t1,), (t2,) = ts.rate([(getTeamRatingAndIncrementGame(m["t1"]),), (getTeamRatingAndIncrementGame(m["t2"]),)], [1 - m["result"], m["result"]])
@@ -123,7 +128,7 @@ for m in ms:
 
 i = 1
 print("{:3}  {:25}  {:5}  {:8}  {:8}".format("", "Team", "Games", "Rating", "SD"))
-tss=sorted(teams.values(), key=lambda x: x["rating"].mu, reverse=True)
+tss = sorted(teams.values(), key=lambda x: x["rating"].mu, reverse=True)
 for p in tss:
     print("{:3d}  {:25.25}  {:<5d}  {:<8.4f}  {:<8.4f}".format(i, p["name"], p["game"], p["rating"].mu, p["rating"].sigma))
     i += 1
