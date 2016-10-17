@@ -55,8 +55,17 @@ print()
 
 s=0
 m=0
+i=0
+c=0
 for t in tss:
-    s+=abs((t["wins"]/t["game"])-0.5)
+    i+=1
     m+=t["game"]
+    c+=(t["wins"]/t["game"])
+c/=i
+for t in tss:
+    s+=((t["wins"]/t["game"])-c)*((t["wins"]/t["game"])-c)
 m/=2
-print((0.25/m)/(s/m))
+print(c)
+print((0.25/m))
+print((s/i))
+print((0.25/m)/(s/i))
