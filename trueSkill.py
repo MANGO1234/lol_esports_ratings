@@ -53,24 +53,13 @@ ts.setup(draw_probability=0)
 for m in ms:
     (t1p1, t1p2, t1p3, t1p4, t1p5), (t2p1, t2p2, t2p3, t2p4, t2p5) = ts.rate(
         [
-            (getPlayerRatingAndIncrementGame(m["t1p1"])
-             , getPlayerRatingAndIncrementGame(m["t1p2"])
-             , getPlayerRatingAndIncrementGame(m["t1p3"])
-             , getPlayerRatingAndIncrementGame(m["t1p4"])
-             , getPlayerRatingAndIncrementGame(m["t1p5"])
-             )
-            , (getPlayerRatingAndIncrementGame(m["t2p1"])
-               , getPlayerRatingAndIncrementGame(m["t2p2"])
-               , getPlayerRatingAndIncrementGame(m["t2p3"])
-               , getPlayerRatingAndIncrementGame(m["t2p4"])
-               , getPlayerRatingAndIncrementGame(m["t2p5"])
-               )
-        ]
-        , [1 - m["result"], m["result"]]
+            (getPlayerRatingAndIncrementGame(m["t1p1"]), getPlayerRatingAndIncrementGame(m["t1p2"]), getPlayerRatingAndIncrementGame(m["t1p3"]), getPlayerRatingAndIncrementGame(m["t1p4"]), getPlayerRatingAndIncrementGame(m["t1p5"])
+             ), (getPlayerRatingAndIncrementGame(m["t2p1"]), getPlayerRatingAndIncrementGame(m["t2p2"]), getPlayerRatingAndIncrementGame(m["t2p3"]), getPlayerRatingAndIncrementGame(m["t2p4"]), getPlayerRatingAndIncrementGame(m["t2p5"])
+                 )
+        ], [1 - m["result"], m["result"]]
     )
     updatePlayerRatings([
-        (t1p1, m["t1p1"], m["t1"]), (t1p2, m["t1p2"], m["t1"]), (t1p3, m["t1p3"], m["t1"]), (t1p4, m["t1p4"], m["t1"]), (t1p5, m["t1p5"], m["t1"])
-        , (t2p1, m["t2p1"], m["t2"]), (t2p2, m["t2p2"], m["t2"]), (t2p3, m["t2p3"], m["t2"]), (t2p4, m["t2p4"], m["t2"]), (t2p5, m["t2p5"], m["t2"])])
+        (t1p1, m["t1p1"], m["t1"]), (t1p2, m["t1p2"], m["t1"]), (t1p3, m["t1p3"], m["t1"]), (t1p4, m["t1p4"], m["t1"]), (t1p5, m["t1p5"], m["t1"]), (t2p1, m["t2p1"], m["t2"]), (t2p2, m["t2p2"], m["t2"]), (t2p3, m["t2p3"], m["t2"]), (t2p4, m["t2p4"], m["t2"]), (t2p5, m["t2p5"], m["t2"])])
 
 i = 1
 print("{:15}  {:25}  {:5}  {:8}  {:8}".format("", "Player", "Team", "Games", "Rating", "SD"))
