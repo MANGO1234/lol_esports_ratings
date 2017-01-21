@@ -2,7 +2,7 @@ import _sqlite3 as sql
 import json
 import sys
 
-conn = sql.connect('matches/matchess.db')
+conn = sql.connect('matches/matches.db')
 conn.row_factory = sql.Row
 db = conn.cursor()
 
