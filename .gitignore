@@ -1,7 +1,7 @@
 out/
 node_modules/
 .idea/
-matches/matchess.db
+matches/matches.db
 *.iml
 query.py
 __pycache__/

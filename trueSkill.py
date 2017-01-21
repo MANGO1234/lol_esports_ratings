@@ -5,7 +5,7 @@ import sys
 
 import trueskill as ts
 
-conn = sql.connect('matches/matchess.db')
+conn = sql.connect('matches/matches.db')
 conn.row_factory = sql.Row
 db = conn.cursor()
 

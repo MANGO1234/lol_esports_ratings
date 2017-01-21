@@ -14,7 +14,7 @@ elif key in config["combined"]:
 elif key == 'all':
     ts=list(config['tournaments'].keys())
 
-conn = sql.connect('matches/matchess.db')
+conn = sql.connect('matches/matches.db')
 conn.row_factory = sql.Row
 db = conn.cursor()
 
