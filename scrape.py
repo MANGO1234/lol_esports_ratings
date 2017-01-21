@@ -12,7 +12,7 @@ if key in config["tournaments"]:
 elif key in config["combined"]:
     ts = config["combined"][key]
 elif key == 'all':
-    ts=list(config['tournaments'].keys())
+    ts = list(config['tournaments'].keys())
 
 conn = sql.connect('matches/matches.db')
 conn.row_factory = sql.Row
@@ -54,13 +54,13 @@ for league in ts:
         else:
             raise Exception('Unknown result: ' + result)
         bans = d(c[5]).text().split(', ')
-        t1b1 = bans[0] if len(bans) > 0  else''
-        t1b2 = bans[1] if len(bans) > 1  else''
-        t1b3 = bans[2] if len(bans) > 2  else''
+        t1b1 = bans[0] if len(bans) > 0 else''
+        t1b2 = bans[1] if len(bans) > 1 else''
+        t1b3 = bans[2] if len(bans) > 2 else''
         bans = d(c[6]).text().split(', ')
-        t2b1 = bans[0] if len(bans) > 0  else''
-        t2b2 = bans[1] if len(bans) > 1  else''
-        t2b3 = bans[2] if len(bans) > 2  else''
+        t2b1 = bans[0] if len(bans) > 0 else''
+        t2b2 = bans[1] if len(bans) > 1 else''
+        t2b3 = bans[2] if len(bans) > 2 else''
         picks = d(c[7]).text().split(', ')
         t1c1 = picks[0]
         t1c2 = picks[1]
@@ -96,7 +96,7 @@ for league in ts:
             t2c1, t2c2, t2c3, t2c4, t2c5
         ))
 
-db.execute('DELETE FROM matches WHERE league in ("'+'","'.join(usedTs)+'")')
+db.execute('DELETE FROM matches WHERE league in ("' + '","'.join(usedTs) + '")')
 db.executemany('INSERT INTO matches VALUES (' + (33 * '?,') + '?)', matches)
 
 conn.commit()
