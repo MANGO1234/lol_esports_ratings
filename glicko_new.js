@@ -20,7 +20,7 @@ function getMatches(key) {
 
         var db = new sqlite3.Database('./matches/matches.db');
         db.serialize(function() {
-            db.all("select * from matches where league in ('" + teams.join("','") + "') order by id", function(err, rows) {
+            db.all("select * from matches where league in ('" + teams.join("','") + "') order by date,id", function(err, rows) {
                 if (err) {
                     reject(err);
                 } else {
