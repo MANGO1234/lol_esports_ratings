@@ -141,6 +141,7 @@
     },
     "combined": {
         "new": ["na17ar", "eu17ar", "lck17ar", "lpl17ar", "lms17ar"],
+        "na16a": ["na16ar", "na16ap"],
         "na16b": ["na16br", "na16bp"],
         "na": ["na17ar"],
         "eu16b": ["eu16br", "eu16bp"],
