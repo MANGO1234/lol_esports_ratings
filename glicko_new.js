@@ -173,7 +173,9 @@ getMatches(key).then(function(matches) {
             write(_.spread(_.partial(printf, formatS, 'Period', 'Start', 'End'))(playersA.map((p) => p.name)));
             formatS = '%-8s %-12s %-12s ' + _.repeat('%-8.1f ', playersA.length);
             model.ratingPeriods.forEach(function(period, i) {
-                write(_.spread(_.partial(printf, formatS, i + 1, period.startDate, period.endDate))(playersA.map((p) => period.ratings[p.name].rating)));
+                write(_.spread(_.partial(printf, formatS, i + 1, period.startDate, period.endDate))(playersA.map((p) => {
+                    return (period.ratings[p.name] && period.ratings[p.name].rating) || 1500;
+                })));
             });
             write();
         }
