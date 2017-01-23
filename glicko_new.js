@@ -1,10 +1,9 @@
 var sqlite3 = require('sqlite3');
-var config = require('./matches/leagues.json');
 var _ = require('lodash');
 var glicko2 = require('glicko2');
 var fs = require('fs');
-var _ = require('lodash');
 var printf = require('printf');
+var config = require('./matches/leagues.json');
 
 
 function getMatches(key) {
@@ -32,7 +31,7 @@ function getMatches(key) {
     });
 }
 
-function calculateModel(matches) {
+function calculateModel(matches, type) {
     var ranking = new glicko2.Glicko2({
         tau: 0.5,
         rating: 1500,
@@ -53,29 +52,85 @@ function calculateModel(matches) {
         return players[name].player;
     }
 
-    // for (let i = 0; i < matches.length; i++) {
-    //     var match = matches[i];
-    //     ranking.updateRatings([
-    //         [getPlayer(match.t1), getPlayer(match.t2), match.result]
-    //     ]);
-    // }
+    if (type === 'ALL') {
+        ranking.updateRatings(matches.map((match) => [getPlayer(match.t1), getPlayer(match.t2), match.result]));
+        return {
+            matches: matches,
+            ranking: ranking,
+            players: players
+        };
+    } else if (type === 'SINGLE') {
+        for (let i = 0; i < matches.length; i++) {
+            let match = matches[i];
+            ranking.updateRatings([
+                [getPlayer(match.t1), getPlayer(match.t2), match.result]
+            ]);
+        }
+        return {
+            matches: matches,
+            ranking: ranking,
+            players: players
+        };
+    } else {
+        var ratingPeriods = [];
+        var newPeriod = {
+            matches: []
+        };
+        var lastMatch;
+        for (let i = 0; i < matches.length; i++) {
+            var match = matches[i];
+            if (i === 0) {
+                newPeriod.matches.push(match);
+                newPeriod.startDate = match.date;
+            } else if (new Date(match.date).getTime() - new Date(lastMatch.date).getTime() <= 25 * 60 * 60 * 1000) {
+                newPeriod.matches.push(match);
+            } else {
+                newPeriod.endDate = newPeriod.matches[newPeriod.matches.length - 1].date;
+                ratingPeriods.push(newPeriod);
+                newPeriod = {
+                    matches: [match],
+                    startDate: match.date
+                };
+            }
+            lastMatch = match;
+        }
+        if (newPeriod.matches.length) {
+            newPeriod.endDate = newPeriod.matches[newPeriod.matches.length - 1].date;
+            ratingPeriods.push(newPeriod);
+        }
 
-    ranking.updateRatings(matches.map(function(match) {
-        return [getPlayer(match.t1), getPlayer(match.t2), match.result];
-    }));
+        for (let i = 0; i < ratingPeriods.length; i++) {
+            var period = ratingPeriods[i];
+            ranking.updateRatings(period.matches.map((match) => [getPlayer(match.t1), getPlayer(match.t2), match.result]));
+            period.ratings = _.mapValues(players, function(player) {
+                return {
+                    rating: player.player.getRating(),
+                    rd: player.player.getRd(),
+                    vol: player.player.getVol()
+                };
+            });
+        }
 
-    return {
-        matches: matches,
-        ranking: ranking,
-        players: players
-    };
+        return {
+            matches: matches,
+            ranking: ranking,
+            players: players,
+            ratingPeriods: ratingPeriods
+        };
+    }
 }
 
 var key = process.argv[2];
-getMatches(key).then(calculateModel).then(function(model) {
+getMatches(key).then(function(matches) {
+    if (process.argv[3] === '0') {
+        return calculateModel(matches, 'ALL');
+    }
+    if (process.argv[3] === '1') {
+        return calculateModel(matches, 'SINGLE');
+    }
+    return calculateModel(matches);
+}).then(function(model) {
     var players = model.players;
-    var weeksUsed = model.weeksUsed;
-
     var playersA = _.values(players);
     playersA.sort(function(v1, v2) {
         return v2.player.getRating() - v1.player.getRating();
@@ -96,9 +151,9 @@ getMatches(key).then(calculateModel).then(function(model) {
     stream.once('open', function() {
         write('******** ' + model.matches.name + ' ********');
         write('**** Current Ratings ****');
-        write(printf('%-8s %-30s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max', 'Vol'));
+        write(printf('%-8s %-25s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max', 'Vol'));
         playersA.forEach(function(v, i) {
-            write(printf('%-8d %-30s %-8.1f %-8.1f %-8.1f %-8.1f %-8.5f', i + 1, v.name, v.player.getRating(), v.player.getRd() * 2,
+            write(printf('%-8d %-25s %-8.1f %-8.1f %-8.1f %-8.1f %-8.5f', i + 1, v.name, v.player.getRating(), v.player.getRd() * 2,
                 v.player.getRating() - v.player.getRd() * 2, v.player.getRating() + v.player.getRd() * 2, v.player.getVol()));
         });
         write();
@@ -108,36 +163,28 @@ getMatches(key).then(calculateModel).then(function(model) {
         write('Range of Ratings: ' + (playersA[0].player.getRating() - playersA[playersA.length - 1].player.getRating()));
         write();
 
-        // write('**** Ratings by Week ****');
-        // var formatS = '%-6s' + _.repeat('%-8s ', playersA.length);
-        // write(_.spread(_.partial(printf, formatS, 'Week'))(playersA.map((p) => p.name)));
-        // formatS = '%-6d' + _.repeat('%-8.1f ', playersA.length);
-        // var lastRating = {};
-        // weeksUsed.forEach(function(week) {
-        //     write(_.spread(_.partial(printf, formatS, week + 1))(playersA.map((p) => {
-        //         if (p.history[week]) {
-        //             lastRating[p.name] = p.history[week].rating;
-        //             return p.history[week].rating;
-        //         } else {
-        //             return lastRating[p.name] === undefined ? -1 : lastRating[p.name];
-        //         }
-        //     })));
-        // });
-        // write();
+        write('**** Ratings by Period ****');
+        formatS = '%-25s %-10s %-10s ' + _.repeat('%-25s ', playersA.length);
+        write(_.spread(_.partial(printf, formatS, 'Period', 'Start', 'End'))(playersA.map((p) => p.name)));
+        formatS = '%-25s %-10s %-10s ' + _.repeat('%-25.1f ', playersA.length);
+        model.ratingPeriods.forEach(function(period, i) {
+            write(_.spread(_.partial(printf, formatS, i + 1, period.startDate, period.endDate))(playersA.map((p) => period.ratings[p.name].rating)));
+        });
+        write();
 
         write('**** Estimated Win Rates (BO1) ****');
-        formatS = '%-30s' + _.repeat('%-30s ', playersA.length);
+        formatS = '%-25s' + _.repeat('%-25s ', playersA.length);
         write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
-        formatS = '%-30s' + _.repeat('%-30.2f ', playersA.length);
+        formatS = '%-25s' + _.repeat('%-25.2f ', playersA.length);
         playersA.forEach(function(p1) {
             write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => ratingToWinRate(p1, p2) * 100)));
         });
         write();
 
         write('**** Estimated Win Rates (BO3) ****');
-        formatS = '%-30s' + _.repeat('%-30s ', playersA.length);
+        formatS = '%-25s' + _.repeat('%-25s ', playersA.length);
         write(_.spread(_.partial(printf, formatS, ''))(playersA.map((p) => p.name)));
-        formatS = '%-30s' + _.repeat('%-30.2f ', playersA.length);
+        formatS = '%-25s' + _.repeat('%-25.2f ', playersA.length);
         playersA.forEach(function(p1) {
             write(_.spread(_.partial(printf, formatS, p1.name))(playersA.map((p2) => {
                 var p = ratingToWinRate(p1, p2);
