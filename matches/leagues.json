@@ -24,6 +24,12 @@
             "bo": 5,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:NA%20LCS%202016%20Summer%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true"
         },
+        "na17ar": {
+            "title": "NA 2017 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:NA%20LCS%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
         "eu16br": {
             "title": "EU 2016 Summer Split Regular Season",
             "type": "regular",
@@ -35,6 +41,12 @@
             "type": "playoff",
             "bo": 5,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:EU%20LCS%202016%20Summer%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "eu17ar": {
+            "title": "EU 2017 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:EU%20LCS%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true"
         },
         "lck15ar": {
             "title": "LCK 2015 Spring Split Regular Season",
@@ -84,6 +96,12 @@
             "bo": 5,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202016%20Summer%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true"
         },
+        "lck17ar": {
+            "title": "LCK 2017 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
         "lpl16br": {
             "title": "LPL 2016 Summer Split Regular Season",
             "type": "regular",
@@ -96,6 +114,12 @@
             "bo": 5,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202016%20Summer%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true"
         },
+        "lpl17ar": {
+            "title": "LPL 2017 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
         "lms16br": {
             "title": "LMS 2016 Summer Split Regular Season",
             "type": "regular",
@@ -107,23 +131,29 @@
             "type": "playoff",
             "bo": 5,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LMS%202016%20Summer%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true"
+        },
+        "lms17ar": {
+            "title": "LMS 2017 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LMS%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true"
         }
     },
     "combined": {
-        "new": ["na16br", "eu16br", "lck16br", "lpl16br", "lms16br"],
+        "new": ["na17ar", "eu17ar", "lck17ar", "lpl17ar", "lms17ar"],
         "na16b": ["na16br", "na16bp"],
-        "na": ["na16br"],
+        "na": ["na17ar"],
         "eu16b": ["eu16br", "eu16bp"],
-        "eu": ["eu16br"],
+        "eu": ["eu17ar"],
         "lcks": ["lck15ar", "lck15ap", "lck15br", "lck15bp", "lck16ar", "lck16ap", "lck16br", "lck16bp"],
         "lck15a": ["lck15ar", "lck15ap"],
         "lck15b": ["lck15br", "lck15bp"],
         "lck16a": ["lck16ar", "lck16ap"],
         "lck16b": ["lck16br", "lck16bp"],
-        "lck": ["lck16br"],
+        "lck": ["lck17ar"],
         "lpl16b": ["lpl16br", "lpl16bp"],
-        "lpl": ["lpl16br"],
+        "lpl": ["lpl17ar"],
         "lms16b": ["lms16br", "lms16bp"],
-        "lms": ["lms16br"]
+        "lms": ["lms17ar"]
     }
 }
