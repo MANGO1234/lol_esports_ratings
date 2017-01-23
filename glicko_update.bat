@@ -1,1 +1,1 @@
-node main.js na & node main.js eu & node main.js lck & node main.js lpl & node main.js lms
+node glicko.js na & node glicko.js eu & node glicko.js lck & node glicko.js lpl & node glicko.js lms
