@@ -1,138 +1,20 @@
-var sqlite3 = require('sqlite3');
 var _ = require('lodash');
 var glicko2 = require('glicko2');
 var fs = require('fs');
 var printf = require('printf');
-var config = require('./matches/leagues.json');
-var namesTranslate = require('./matches/names.json');
+var s = require('./glicko_shared.js');
 
-
-function getMatches(key) {
-    return new Promise(function(resolve, reject) {
-        var teams;
-        if (config.tournaments[key]) {
-            teams = [key];
-        } else if (config.combined[key]) {
-            teams = config.combined[key];
-        } else if (key === 'all') {
-            teams = Object.keys(config.tournaments);
-        }
-
-        var db = new sqlite3.Database('./matches/matches.db');
-        db.serialize(function() {
-            db.all("select * from matches where league in ('" + teams.join("','") + "') order by date,id", function(err, rows) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
-                }
-                db.close();
-            });
-        });
-    });
-}
-
-function calculateModel(matches, type) {
-    var ranking = new glicko2.Glicko2({
-        tau: 0.5,
-        rating: 1500,
-        rd: 200,
-        vol: 0.06
-    });
-
-    var players = {};
-
-    function getPlayer(name) {
-        shortName = namesTranslate[name] || name;
-        if (!players[shortName]) {
-            players[shortName] = {
-                name: shortName,
-                fullName: name,
-                rating: ranking.makePlayer(),
-                history: {}
-            };
-        }
-        return players[shortName].rating;
-    }
-
-    if (type === 'ALL') {
-        ranking.updateRatings(matches.map((match) => [getPlayer(match.t1), getPlayer(match.t2), match.result]));
-        return {
-            matches: matches,
-            ranking: ranking,
-            players: players
-        };
-    } else if (type === 'SINGLE') {
-        for (let i = 0; i < matches.length; i++) {
-            let match = matches[i];
-            ranking.updateRatings([
-                [getPlayer(match.t1), getPlayer(match.t2), match.result]
-            ]);
-        }
-        return {
-            matches: matches,
-            ranking: ranking,
-            players: players
-        };
-    } else {
-        var ratingPeriods = [];
-        var newPeriod = {
-            matches: []
-        };
-        var lastMatch;
-        for (let i = 0; i < matches.length; i++) {
-            var match = matches[i];
-            if (i === 0) {
-                newPeriod.matches.push(match);
-                newPeriod.startDate = match.date;
-            } else if (new Date(match.date).getTime() - new Date(lastMatch.date).getTime() <= 25 * 60 * 60 * 1000) {
-                newPeriod.matches.push(match);
-            } else {
-                newPeriod.endDate = newPeriod.matches[newPeriod.matches.length - 1].date;
-                ratingPeriods.push(newPeriod);
-                newPeriod = {
-                    matches: [match],
-                    startDate: match.date
-                };
-            }
-            lastMatch = match;
-        }
-        if (newPeriod.matches.length) {
-            newPeriod.endDate = newPeriod.matches[newPeriod.matches.length - 1].date;
-            ratingPeriods.push(newPeriod);
-        }
-
-        for (let i = 0; i < ratingPeriods.length; i++) {
-            var period = ratingPeriods[i];
-            ranking.updateRatings(period.matches.map((match) => [getPlayer(match.t1), getPlayer(match.t2), match.result]));
-            period.ratings = _.mapValues(players, function(player) {
-                return {
-                    name: player.name,
-                    rating: player.rating.getRating(),
-                    rd: player.rating.getRd(),
-                    vol: player.rating.getVol()
-                };
-            });
-        }
-
-        return {
-            matches: matches,
-            ranking: ranking,
-            players: players,
-            ratingPeriods: ratingPeriods
-        };
-    }
-}
+var ratingToWinRate = s.ratingToWinRate;
 
 var key = process.argv[2];
-getMatches(key).then(function(matches) {
+s.getMatches(key).then(function(matches) {
     if (process.argv[3] === '0') {
-        return calculateModel(matches, 'ALL');
+        return s.calculateModel(matches, 'ALL');
     }
     if (process.argv[3] === '1') {
-        return calculateModel(matches, 'SINGLE');
+        return s.calculateModel(matches, 'SINGLE');
     }
-    return calculateModel(matches);
+    return s.calculateModel(matches);
 }).then(function(model) {
     var players = model.players;
     var playersA = _.values(players);
@@ -220,12 +102,4 @@ function sd(arr) {
         sum += (arr[i] - m) * (arr[i] - m);
     }
     return Math.sqrt(sum / arr.length);
-}
-
-function ratingToWinRate(p1, p2) {
-    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / 400));
-}
-
-function ratingToWinRate2(p1, p2) {
-    return 1 / (1 + Math.pow(10, (p2.getRating() - p1.getRating()) / 400));
 }
