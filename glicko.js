@@ -48,11 +48,11 @@ function calculateModel(matches, type) {
             players[shortName] = {
                 name: shortName,
                 fullName: name,
-                player: ranking.makePlayer(),
+                rating: ranking.makePlayer(),
                 history: {}
             };
         }
-        return players[shortName].player;
+        return players[shortName].rating;
     }
 
     if (type === 'ALL') {
@@ -108,9 +108,9 @@ function calculateModel(matches, type) {
             period.ratings = _.mapValues(players, function(player) {
                 return {
                     name: player.name,
-                    rating: player.player.getRating(),
-                    rd: player.player.getRd(),
-                    vol: player.player.getVol()
+                    rating: player.rating.getRating(),
+                    rd: player.rating.getRd(),
+                    vol: player.rating.getVol()
                 };
             });
         }
@@ -137,7 +137,7 @@ getMatches(key).then(function(matches) {
     var players = model.players;
     var playersA = _.values(players);
     playersA.sort(function(v1, v2) {
-        return v2.player.getRating() - v1.player.getRating();
+        return v2.rating.getRating() - v1.rating.getRating();
     });
 
     var stream = fs.createWriteStream('out/' + key + '.txt');
@@ -153,18 +153,17 @@ getMatches(key).then(function(matches) {
     }
 
     stream.once('open', function() {
-        write('******** ' + model.matches.name + ' ********');
         write('**** Current Ratings ****');
         write(printf('%-8s %-30s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max', 'Vol'));
         playersA.forEach(function(v, i) {
-            write(printf('%-8d %-30s %-8.1f %-8.1f %-8.1f %-8.1f %-8.5f', i + 1, v.fullName.substring(0, 30), v.player.getRating(), v.player.getRd() * 2,
-                v.player.getRating() - v.player.getRd() * 2, v.player.getRating() + v.player.getRd() * 2, v.player.getVol()));
+            write(printf('%-8d %-30s %-8.1f %-8.1f %-8.1f %-8.1f %-8.5f', i + 1, v.fullName.substring(0, 30), v.rating.getRating(), v.rating.getRd() * 2,
+                v.rating.getRating() - v.rating.getRd() * 2, v.rating.getRating() + v.rating.getRd() * 2, v.rating.getVol()));
         });
         write();
-        var ratingsA = playersA.map((p) => p.player.getRating());
+        var ratingsA = playersA.map((p) => p.rating.getRating());
         write('Mean of Ratings: ' + mean(ratingsA));
         write('SD of Ratings: ' + sd(ratingsA));
-        write('Range of Ratings: ' + (playersA[0].player.getRating() - playersA[playersA.length - 1].player.getRating()));
+        write('Range of Ratings: ' + (playersA[0].rating.getRating() - playersA[playersA.length - 1].rating.getRating()));
         write();
 
         if (model.ratingPeriods) {
@@ -224,7 +223,7 @@ function sd(arr) {
 }
 
 function ratingToWinRate(p1, p2) {
-    return 1 / (1 + Math.pow(10, (p2.player.getRating() - p1.player.getRating()) / 400));
+    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / 400));
 }
 
 function ratingToWinRate2(p1, p2) {
