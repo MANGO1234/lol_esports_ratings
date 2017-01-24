@@ -5,17 +5,17 @@ var printf = require('printf');
 var s = require('./glicko_shared.js');
 
 var ratingToWinRate = s.ratingToWinRate;
+var calculateModel;
+if (process.argv[3] === '0') {
+    calculateModel = _.partialRight(s.calculateModel, 'ALL');
+} else if (process.argv[3] === '1') {
+    calculateModel = _.partialRight(s.calculateModel, 'SINGLE');
+} else {
+    calculateModel = s.calculateModel;
+}
 
 var key = process.argv[2];
-s.getMatches(key).then(function(matches) {
-    if (process.argv[3] === '0') {
-        return s.calculateModel(matches, 'ALL');
-    }
-    if (process.argv[3] === '1') {
-        return s.calculateModel(matches, 'SINGLE');
-    }
-    return s.calculateModel(matches);
-}).then(function(model) {
+s.getMatches(key).then(calculateModel).then(function(model) {
     var players = model.players;
     var playersA = _.values(players);
     playersA.sort(function(v1, v2) {
