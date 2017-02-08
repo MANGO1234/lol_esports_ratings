@@ -1,7 +1,17 @@
 import json
 import sys
+import requests
 from pyquery import PyQuery as pq
 import _sqlite3 as sql
+
+# if len(sys.argv) > 2 and sys.argv[2] == "1":
+#     r = requests.get("https://acs.leagueoflegends.com/v1/stats/game/TRLH3/1001480016?gameHash=16b716b8b1298472")
+#     if r.status_code != 200:
+#         print("Incomplete Game: ")
+#     else:
+#         file = open("matches/details/test.json", "w")
+#         file.write(r.text)
+#         print(r.json())
 
 with open('matches/leagues.json') as data_file:
     config = json.load(data_file)
@@ -95,6 +105,7 @@ for league in ts:
             t1c1, t1c2, t1c3, t1c4, t1c5,
             t2c1, t2c2, t2c3, t2c4, t2c5
         ))
+
 
 db.execute('DELETE FROM matches WHERE league in ("' + '","'.join(usedTs) + '")')
 db.executemany('INSERT INTO matches VALUES (' + (33 * '?,') + '?)', matches)
