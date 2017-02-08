@@ -50,27 +50,29 @@ function calculateModel(matches, type) {
                 history: {}
             };
         }
-        return players[shortName].rating;
+        return players[shortName];
     }
 
     if (type === 'ALL') {
-        ranking.updateRatings(matches.map((match) => [getPlayer(match.t1), getPlayer(match.t2), match.result]));
+        ranking.updateRatings(matches.map((match) => [getPlayer(match.t1).rating, getPlayer(match.t2).rating, match.result]));
         return {
             matches: matches,
             ranking: ranking,
-            players: players
+            players: players,
+            getPlayer: getPlayer
         };
     } else if (type === 'SINGLE') {
         for (let i = 0; i < matches.length; i++) {
             let match = matches[i];
             ranking.updateRatings([
-                [getPlayer(match.t1), getPlayer(match.t2), match.result]
+                [getPlayer(match.t1).rating, getPlayer(match.t2).rating, match.result]
             ]);
         }
         return {
             matches: matches,
             ranking: ranking,
-            players: players
+            players: players,
+            getPlayer: getPlayer
         };
     } else {
         var ratingPeriods = [];
@@ -107,7 +109,7 @@ function calculateModel(matches, type) {
 
         for (let i = 0; i < ratingPeriods.length; i++) {
             var period = ratingPeriods[i];
-            ranking.updateRatings(period.matches.map((match) => [getPlayer(match.t1), getPlayer(match.t2), match.result]));
+            ranking.updateRatings(period.matches.map((match) => [getPlayer(match.t1).rating, getPlayer(match.t2).rating, match.result]));
             period.ratings = _.mapValues(players, function(player) {
                 return {
                     name: player.name,
@@ -122,7 +124,8 @@ function calculateModel(matches, type) {
             matches: matches,
             ranking: ranking,
             players: players,
-            ratingPeriods: ratingPeriods
+            ratingPeriods: ratingPeriods,
+            getPlayer: getPlayer
         };
     }
 }
