@@ -54,9 +54,9 @@ var s = require('./glicko_shared.js');
 
 var ratingToWinRate = s.ratingToWinRate;
 var calculateModel;
-if (process.argv[3] === '0') {
+if (process.argv[5] === '0') {
     calculateModel = _.partialRight(s.calculateModel, 'ALL');
-} else if (process.argv[3] === '1') {
+} else if (process.argv[5] === '1') {
     calculateModel = _.partialRight(s.calculateModel, 'SINGLE');
 } else {
     calculateModel = s.calculateModel;

@@ -107,9 +107,11 @@ def updateTeamRatings(rs):
 tempTs = ts.TrueSkill()
 
 
-def winRate(r1, r2):
-    return tempTs.cdf((r1.mu - r2.mu) / (25.0 / 6) / math.sqrt(2))
-
+def winRate(rA, rB):
+    deltaMu = rA.mu - rB.mu
+    sumSigma = rA.sigma**2 + rB.sigma**2
+    denominator = math.sqrt(2 * (ts.BETA * ts.BETA) + sumSigma)
+    return tempTs.cdf(deltaMu / denominator)
 
 for m in ms:
     (t1,), (t2,) = ts.rate([(getTeamRatingAndIncrementGame(m["t1"]),), (getTeamRatingAndIncrementGame(m["t2"]),)], [1 - m["result"], m["result"]])

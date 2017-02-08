@@ -5,3 +5,4 @@ matches/matches.db
 *.iml
 query.py
 __pycache__/
+matches/details/

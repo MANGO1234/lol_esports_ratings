@@ -85,8 +85,10 @@ function calculateModel(matches, type) {
                 newPeriod.startDate = match.date;
             } else if (new Date(match.date).getTime() - new Date(lastMatch.date).getTime() <= 25 * 60 * 60 * 1000) {
                 newPeriod.matches.push(match);
-            } else if (match.league === "lck17ar" && match.date === "2017-01-21") {
                 // fix: sometimes the days in the week is not consecutive
+            } else if (match.league === "lck17ar" && match.date === "2017-01-21") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck17ar" && match.date === "2017-02-04") {
                 newPeriod.matches.push(match);
             } else {
                 newPeriod.endDate = newPeriod.matches[newPeriod.matches.length - 1].date;
