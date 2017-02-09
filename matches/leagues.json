@@ -147,6 +147,8 @@
         "eu16b": ["eu16br", "eu16bp"],
         "eu": ["eu17ar"],
         "lcks": ["lck15ar", "lck15ap", "lck15br", "lck15bp", "lck16ar", "lck16ap", "lck16br", "lck16bp"],
+        "bor": ["lck15ar", "lck15br", "lck16ar", "lck16br", "lpl16br", "eu16br", "na16br"],
+        "2016r": ["lck16ar", "lck16br", "lpl16br", "eu16br", "na16br", "lms16br"],
         "lck15a": ["lck15ar", "lck15ap"],
         "lck15b": ["lck15br", "lck15bp"],
         "lck16a": ["lck16ar", "lck16ap"],

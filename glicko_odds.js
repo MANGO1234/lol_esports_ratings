@@ -66,8 +66,8 @@ var key = process.argv[2];
 s.getMatches(key).then(calculateModel).then(function(model) {
     var players = model.players;
 
-    var p1 = model.players[process.argv[3]];
-    var p2 = model.players[process.argv[4]];
+    var p1 = model.players[process.argv[3].toUpperCase()];
+    var p2 = model.players[process.argv[4].toUpperCase()];
     if (!(p1 && p2)) {
         throw new Error('Unknown players');
     }
@@ -99,8 +99,8 @@ s.getMatches(key).then(calculateModel).then(function(model) {
     function dynamicP(a) {
         var data = calculateModel(model.matches);
         var players = data.players;
-        var p1 = data.players[process.argv[3]];
-        var p2 = data.players[process.argv[4]];
+        var p1 = data.players[process.argv[3].toUpperCase()];
+        var p2 = data.players[process.argv[4].toUpperCase()];
         var c = 1;
         for (var i = 0; i < a.length; i++) {
             var p = ratingToWinRate(p1, p2);

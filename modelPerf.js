@@ -4,26 +4,23 @@ var fs = require('fs');
 var printf = require('printf');
 var s = require('./glicko_shared.js');
 
-var ratingToWinRate = function(p1, p2) {
-    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / 460));
-};
 
 var calculateModel = s.calculateModel;
+var DEVIATION = 460;
 var BIN_SIZE = 5;
 var BIN_NUM = 100 / BIN_SIZE + 1;
+var CORRECTION = 0.0;
+var BLUE_SIDE = 30;
+
+var ratingToWinRate = function(p1, p2) {
+    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating() - BLUE_SIDE) / DEVIATION));
+};
 
 function runModel(scoring, model, matches, n) {
     n = n || 0;
     var bins = [];
-    // this uses both winning and losing player - removes blue side advantage in bins
-    var bins2 = [];
     for (let i = 0; i < BIN_NUM; i++) {
         bins[i] = {
-            wins: 0,
-            expected: 0,
-            total: 0
-        };
-        bins2[i] = {
             wins: 0,
             expected: 0,
             total: 0
@@ -43,19 +40,8 @@ function runModel(scoring, model, matches, n) {
         }
         bins[k].expected += prediction;
         bins[k].total++;
-
-        if (match.result) {
-            bins2[k].wins++;
-        } else {
-            bins2[BIN_NUM - 1 - k].wins++;
-        }
-        bins2[k].expected += prediction;
-        bins2[k].total++;
-        bins2[BIN_NUM - 1 - k].expected += 1 - prediction;
-        bins2[BIN_NUM - 1 - k].total++;
     }
     scoring.bins = bins;
-    scoring.bins2 = bins2;
     return scoring;
 }
 
@@ -113,6 +99,10 @@ function t1Wins(data) {
     return 1;
 }
 
+function correctBlueSide(r) {
+    return r + (1 - r) * CORRECTION;
+}
+
 function glicko_all(data) {
     var model = calculateModel(data.matches, "ALL");
     var p1 = model.getPlayer(data.predict.t1);
@@ -121,10 +111,7 @@ function glicko_all(data) {
 }
 
 function glicko_all_corrected(data) {
-    var model = calculateModel(data.matches, "ALL");
-    var p1 = model.getPlayer(data.predict.t1);
-    var p2 = model.getPlayer(data.predict.t2);
-    return ratingToWinRate(p1, p2) + (1 - ratingToWinRate(p1, p2)) * 0.025;
+    return correctBlueSide(glicko_all(data));
 }
 
 function glicko_single(data) {
@@ -135,10 +122,7 @@ function glicko_single(data) {
 }
 
 function glicko_single_corrected(data) {
-    var model = calculateModel(data.matches, "SINGLE");
-    var p1 = model.getPlayer(data.predict.t1);
-    var p2 = model.getPlayer(data.predict.t2);
-    return ratingToWinRate(p1, p2) + (1 - ratingToWinRate(p1, p2)) * 0.025;
+    return correctBlueSide(glicko_single(data));
 }
 
 
@@ -150,10 +134,7 @@ function glicko_week(data) {
 }
 
 function glicko_week_corrected(data) {
-    var model = calculateModel(data.matches);
-    var p1 = model.getPlayer(data.predict.t1);
-    var p2 = model.getPlayer(data.predict.t2);
-    return ratingToWinRate(p1, p2) + (1 - ratingToWinRate(p1, p2)) * 0.025;
+    return correctBlueSide(glicko_week(data));
 }
 
 // doesn't change ratings during the period
@@ -172,17 +153,7 @@ function glicko_week2(data) {
 }
 
 function glicko_week2_corrected(data) {
-    data.matches.push(data.predict);
-    var model = calculateModel(data.matches);
-    var tmp = model.ratingPeriods.map((tmp) => tmp.matches);
-    var k = [];
-    for (let i = 0; i < tmp.length - 1; i++) {
-        k = k.concat(tmp[i]);
-    }
-    model = calculateModel(k);
-    var p1 = model.getPlayer(data.predict.t1);
-    var p2 = model.getPlayer(data.predict.t2);
-    return ratingToWinRate(p1, p2) + (1 - ratingToWinRate(p1, p2)) * 0.025;
+    return correctBlueSide(glicko_week2(data));
 }
 
 // analysis
@@ -252,41 +223,11 @@ function outputBins(all, fn) {
     console.log(_.partial(printf, "Actual 2   " + _.repeat("%-5.1f ", BIN_NUM)).apply(null, bins.map((a) => a.wins)));
 }
 
-function outputBins2(all, fn) {
-    all = all.map((matches) => runModel(BrierScore(), fn, matches, Math.min(Math.round(matches.length / 2)), 80));
-    var header = [];
-    var bins = [];
-    for (let i = 0; i < BIN_NUM; i++) {
-        header.push(i * BIN_SIZE);
-        bins[i] = {
-            wins: 0,
-            expected: 0,
-            total: 0
-        };
-    }
-    for (let i = 0; i < all.length; i++) {
-        var league = all[i];
-        for (let i = 0; i < BIN_NUM; i++) {
-            bins[i].wins += league.bins2[i].wins;
-            bins[i].expected += league.bins2[i].expected;
-            bins[i].total += league.bins2[i].total;
-        }
-    }
-    console.log(_.partial(printf, "Bin        " + _.repeat("%-5d ", BIN_NUM)).apply(null, header));
-    console.log(_.partial(printf, "Games      " + _.repeat("%-5d ", BIN_NUM)).apply(null, bins.map((a) => a.total)));
-    console.log(_.partial(printf, "Expected   " + _.repeat("%-5.1f ", BIN_NUM)).apply(null, bins.map((a) => a.total ? 100 * a.expected / a.total : -1)));
-    console.log(_.partial(printf, "Actual     " + _.repeat("%-5.1f ", BIN_NUM)).apply(null, bins.map((a) => a.total ? 100 * a.wins / a.total : -1)));
-    console.log(_.partial(printf, "Expected 2 " + _.repeat("%-5.1f ", BIN_NUM)).apply(null, bins.map((a) => a.expected)));
-    console.log(_.partial(printf, "Actual 2   " + _.repeat("%-5.1f ", BIN_NUM)).apply(null, bins.map((a) => a.wins)));
-}
-
 function scoreBin(all, fn, rwr, binSize) {
-    ratingToWinRate = function(p1, p2) {
-        return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / rwr));
-    };
+    DEVIATION = rwr;
     BIN_SIZE = binSize;
     BIN_NUM = 100 / BIN_SIZE + 1;
-    all = all.map((matches) => runModel(BrierScore(), fn, matches, Math.min(Math.round(matches.length / 2)), 80));
+    all = all.map((matches) => runModel(BrierScore(), fn, matches, Math.min(Math.round(matches.length / 2)), 100));
     var header = [];
     var bins = [];
     for (let i = 0; i < BIN_NUM; i++) {
@@ -314,46 +255,24 @@ function scoreBin(all, fn, rwr, binSize) {
             k++;
         }
     }
-    console.log(k);
-    return sum / k;
+    return {
+        score: sum / k,
+        n: k
+    };
 }
 
-function scoreBin2(all, fn, rwr, binSize) {
-    ratingToWinRate = function(p1, p2) {
-        return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / rwr));
-    };
-    BIN_SIZE = binSize;
-    BIN_NUM = 100 / BIN_SIZE + 1;
-    all = all.map((matches) => runModel(BrierScore(), fn, matches, Math.min(Math.round(matches.length / 2)), 80));
+function scoreAll(all, fn) {
+    all = all.map((matches) => runModel(BrierScore(), fn, matches, Math.min(Math.round(matches.length / 2)), 100));
     var header = [];
     var bins = [];
-    for (let i = 0; i < BIN_NUM; i++) {
-        header.push(i * BIN_SIZE);
-        bins[i] = {
-            wins: 0,
-            expected: 0,
-            total: 0
-        };
-    }
+    var total = 0;
     for (let i = 0; i < all.length; i++) {
         var league = all[i];
-        for (let i = 0; i < BIN_NUM; i++) {
-            bins[i].wins += league.bins2[i].wins;
-            bins[i].expected += league.bins2[i].expected;
-            bins[i].total += league.bins2[i].total;
-        }
+        total += league.getScore();
     }
-    var sum = 0;
-    var k = 0;
-    for (let i = 0; i < bins.length; i++) {
-        var bin = bins[i];
-        if (bin.total !== 0) {
-            sum += (bin.wins - bin.expected) * (bin.wins - bin.expected);
-            k++;
-        }
-    }
-    console.log(k);
-    return sum / k;
+    return {
+        score: total
+    };
 }
 
 
@@ -365,7 +284,11 @@ Promise.all([
     s.getMatches("na16br"),
     s.getMatches("eu16br"),
     s.getMatches("lpl16br"),
-    s.getMatches("lms16br")
+    s.getMatches("lms16br"),
+    s.getMatches("lck17ar"),
+    s.getMatches("na17ar"),
+    s.getMatches("eu17ar"),
+    s.getMatches("lpl17ar")
 ]).then(function(a) {
     var lck15arM = a[0];
     var lck15brM = a[1];
@@ -375,24 +298,35 @@ Promise.all([
     var eu16brM = a[5];
     var lpl16brM = a[6];
     var lms16brM = a[7];
+    var lck17arM = a[8];
+    var na17arM = a[9];
+    var eu17arM = a[10];
+    var lpl17arM = a[11];
+    DEVIATION = 400;
+    BLUE_SIDE = 10;
     output("lpl", eu16brM);
     output("lms", lms16brM);
     output("lck", lck16brM);
     output("na", na16brM);
     output("eu", eu16brM);
-    outputBins2(a.slice(0, 7), glicko_all);
-    outputBins(a.slice(0, 7), glicko_all_corrected);
-    // outputBins2(a.slice(0, 7), glicko_single);
-    // outputBins2(a.slice(0, 7), glicko_week);
-    // outputBins2(a.slice(0, 7), glicko_week2);
-    // outputBins(a.slice(0, 8), glicko_all_corrected);
-    // outputBins(a.slice(0, 8), glicko_single_corrected);
-    // outputBins(a.slice(0, 8), glicko_week_corrected);
-    // outputBins(a.slice(0, 8), glicko_week2_corrected);
-    // for (let i = 400; i < 600; i += 10) {
-    //     console.log(i, scoreBin(a.slice(0, 7), glicko_all_corrected, i, 4));
-    //     console.log(i, scoreBin(a.slice(0, 7), glicko_all, i, 4));
-    // }
+    outputBins(a.slice(3, 8), glicko_all);
+    var t = [];
+    for (let i = 0; i < 150; i += 5) {
+        for (let j = 0; j < 100; j += 10) {
+            BLUE_SIDE = i;
+            DEVIATION = 400 + j;
+            let k = {};
+            k = scoreAll(a.slice(8, 12), glicko_all);
+            k.blue = i;
+            k.dev = 400 + j;
+            t.push(k);
+        }
+    }
+    t.sort(function(a, b) {
+        return a.score - b.score;
+    });
+    console.log(t);
+    console.log(1 / (1 + Math.pow(10, (-100) / DEVIATION)));
 }).catch(function(e) {
     console.log(e);
 });
