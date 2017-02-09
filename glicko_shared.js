@@ -32,7 +32,7 @@ function getMatches(key) {
 
 function calculateModel(matches, type) {
     var ranking = new glicko2.Glicko2({
-        tau: 0.5,
+        tau: 0.7,
         rating: 1500,
         rd: 200,
         vol: 0.06
@@ -134,6 +134,10 @@ function ratingToWinRate(p1, p2) {
     return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / 400));
 }
 
+function ratingToWinRateAdjusted(p1, p2) {
+    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / 460));
+}
+
 function ratingToWinRate2(p1, p2) {
     return 1 / (1 + Math.pow(10, (p2.getRating() - p1.getRating()) / 400));
 }
@@ -142,5 +146,6 @@ module.exports = {
     getMatches: getMatches,
     calculateModel: calculateModel,
     ratingToWinRate: ratingToWinRate,
+    ratingToWinRateAdjusted: ratingToWinRateAdjusted,
     ratingToWinRate2: ratingToWinRate2
 };

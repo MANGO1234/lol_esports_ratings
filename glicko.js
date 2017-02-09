@@ -4,7 +4,7 @@ var fs = require('fs');
 var printf = require('printf');
 var s = require('./glicko_shared.js');
 
-var ratingToWinRate = s.ratingToWinRate;
+var ratingToWinRate = s.ratingToWinRateAdjusted;
 var calculateModel;
 if (process.argv[3] === '0') {
     calculateModel = _.partialRight(s.calculateModel, 'ALL');
