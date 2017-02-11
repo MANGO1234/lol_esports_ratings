@@ -6,14 +6,14 @@ var s = require('./glicko_shared.js');
 
 
 var calculateModel = s.calculateModel;
-var DEVIATION = 400;
+var DEVIATION = 500;
 var BIN_SIZE = 5;
 var BIN_NUM = 100 / BIN_SIZE + 1;
 var CORRECTION = 0.0;
 var BLUE_SIDE = 20;
 
 var g = function(variance) {
-    return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / 400 / Math.PI, 2) * variance);
+    return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / DEVIATION / Math.PI, 2) * variance);
 };
 
 var ratingToWinRate = function(p1, p2) {
@@ -206,7 +206,7 @@ function outputBins(all, fn) {
 }
 
 function scoreAll(all, fn) {
-    all = all.map((matches) => runModel(BrierScore(), fn, matches, Math.min(Math.round(matches.length / 2)), 100));
+    all = all.map((matches) => runModel(RMSE(), fn, matches, Math.min(Math.round(matches.length / 2)), 100));
     var total = 0;
     for (let i = 0; i < all.length; i++) {
         total += all[i].getScore();
@@ -243,21 +243,20 @@ Promise.all([
     var na17arM = a[9];
     var eu17arM = a[10];
     var lpl17arM = a[11];
-    DEVIATION = 400;
-    BLUE_SIDE = 10;
     output("lms", lms16brM);
     output("lpl", lpl16brM);
     output("lck", lck16brM);
     output("na", na16brM);
     output("eu", eu16brM);
-    outputBins(a.slice(3, 8), glicko_all);
+    DEVIATION = 500;
+    outputBins(a.slice(1, 6), glicko_all);
     var t = [];
-    for (let i = 0; i < 150; i += 5) {
-        for (let j = 0; j < 1; j += 10) {
-            BLUE_SIDE = i;
+    for (let i = 0; i < 1; i += 5) {
+        for (let j = 0; j < 200; j += 10) {
+            BLUE_SIDE = 20;
             DEVIATION = 400 + j;
             let k = {};
-            k = scoreAll(a.slice(3, 8), glicko_week);
+            k = scoreAll(a.slice(3, 4), glicko_all);
             k.blue = i;
             k.dev = 400 + j;
             t.push(k);
