@@ -129,13 +129,12 @@ function calculateModel(matches, type) {
         };
     }
 }
+var g = function(variance) {
+    return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / 400 / Math.PI, 2) * variance);
+};
 
 function ratingToWinRate(p1, p2) {
-    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / 400));
-}
-
-function ratingToWinRateAdjusted(p1, p2) {
-    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / 460));
+    return 1 / (1 + Math.pow(10, g(p2.rating.getRd() * p2.rating.getRd()) * (p2.rating.getRating() - p1.rating.getRating()) / 400));
 }
 
 function ratingToWinRate2(p1, p2) {
@@ -146,6 +145,6 @@ module.exports = {
     getMatches: getMatches,
     calculateModel: calculateModel,
     ratingToWinRate: ratingToWinRate,
-    ratingToWinRateAdjusted: ratingToWinRateAdjusted,
+    g: g,
     ratingToWinRate2: ratingToWinRate2
 };
