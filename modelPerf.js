@@ -5,12 +5,20 @@ var printf = require('printf');
 var s = require('./glicko_shared.js');
 
 
-var calculateModel = s.calculateModel;
+var calculateModel = function(a, b) {
+    return s.calculateModel(a, b, T);
+};
 var DEVIATION = 500;
 var BIN_SIZE = 5;
 var BIN_NUM = 100 / BIN_SIZE + 1;
 var CORRECTION = 0.0;
 var BLUE_SIDE = 20;
+var T = {
+    tau: 0.5,
+    rating: 1500,
+    rd: 200,
+    vol: 0.06
+};
 
 var g = function(variance) {
     return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / DEVIATION / Math.PI, 2) * variance);
@@ -144,26 +152,14 @@ function output(league, matches) {
     console.log(league);
     var start = Math.round(matches.length / 2);
     var model = null;
-    BLUE_SIDE = 0;
-    model = runModel(BrierScore(), glicko_all, matches, start);
-    console.log(model.getScore());
     BLUE_SIDE = 15;
     model = runModel(BrierScore(), glicko_all, matches, start);
-    console.log(model.getScore());
-    BLUE_SIDE = 0;
-    model = runModel(BrierScore(), glicko_single, matches, start);
     console.log(model.getScore());
     BLUE_SIDE = 15;
     model = runModel(BrierScore(), glicko_single, matches, start);
     console.log(model.getScore());
-    BLUE_SIDE = 0;
-    model = runModel(BrierScore(), glicko_week, matches, start);
-    console.log(model.getScore());
     BLUE_SIDE = 15;
     model = runModel(BrierScore(), glicko_week, matches, start);
-    console.log(model.getScore());
-    BLUE_SIDE = 0;
-    model = runModel(BrierScore(), glicko_week2, matches, start);
     console.log(model.getScore());
     BLUE_SIDE = 15;
     model = runModel(BrierScore(), glicko_week2, matches, start);
@@ -206,13 +202,15 @@ function outputBins(all, fn) {
 }
 
 function scoreAll(all, fn) {
-    all = all.map((matches) => runModel(RMSE(), fn, matches, Math.min(Math.round(matches.length / 2)), 100));
+    all = all.map((matches) => runModel(BrierScore(), fn, matches, Math.min(Math.round(matches.length / 2)), 100));
     var total = 0;
+    var totaln = 0;
     for (let i = 0; i < all.length; i++) {
-        total += all[i].getScore();
+        total += all[i].score;
+        totaln += all[i].n;
     }
     return {
-        score: total
+        score: total / totaln
     };
 }
 
@@ -221,11 +219,16 @@ Promise.all([
     s.getMatches("lck15ar"),
     s.getMatches("lck15br"),
     s.getMatches("lck16ar"),
-    s.getMatches("lck16br"),
-    s.getMatches("na16br"),
-    s.getMatches("eu16br"),
-    s.getMatches("lpl16br"),
-    s.getMatches("lms16br"),
+    // s.getMatches("lck16br"),
+    // s.getMatches("na16br"),
+    // s.getMatches("eu16br"),
+    // s.getMatches("lpl16br"),
+    // s.getMatches("lms16br"),
+    s.getMatches("lck16b"),
+    s.getMatches("na16b"),
+    s.getMatches("eu16b"),
+    s.getMatches("lpl16b"),
+    s.getMatches("lms16b"),
     s.getMatches("lck17ar"),
     s.getMatches("na17ar"),
     s.getMatches("eu17ar"),
@@ -248,15 +251,17 @@ Promise.all([
     output("lck", lck16brM);
     output("na", na16brM);
     output("eu", eu16brM);
-    DEVIATION = 500;
+    DEVIATION = 440;
     outputBins(a.slice(1, 6), glicko_all);
     var t = [];
     for (let i = 0; i < 1; i += 5) {
         for (let j = 0; j < 200; j += 10) {
-            BLUE_SIDE = 20;
             DEVIATION = 400 + j;
             let k = {};
-            k = scoreAll(a.slice(3, 4), glicko_all);
+            BLUE_SIDE = 20;
+            k = scoreAll(a.slice(3, 8), glicko_week);
+            // BLUE_SIDE = 100;
+            // k = scoreAll(a.slice(8, 12), glicko_week);
             k.blue = i;
             k.dev = 400 + j;
             t.push(k);
