@@ -8,10 +8,9 @@ var s = require('./glicko_shared.js');
 var calculateModel = function(a, b) {
     return s.calculateModel(a, b, T);
 };
-var DEVIATION = 500;
 var BIN_SIZE = 5;
 var BIN_NUM = 100 / BIN_SIZE + 1;
-var CORRECTION = 0.0;
+var DEVIATION = 500;
 var BLUE_SIDE = 20;
 var T = {
     tau: 0.5,
@@ -156,21 +155,12 @@ function output(league, matches) {
     model = runModel(BrierScore(), glicko_all, matches, start);
     console.log(model.getScore());
     BLUE_SIDE = 15;
-    model = runModel(BrierScore(), glicko_single, matches, start);
-    console.log(model.getScore());
-    BLUE_SIDE = 15;
     model = runModel(BrierScore(), glicko_week, matches, start);
     console.log(model.getScore());
     BLUE_SIDE = 15;
     model = runModel(BrierScore(), glicko_week2, matches, start);
     console.log(model.getScore());
     console.log();
-    // var header = [];
-    // for (let i = 0; i < BIN_NUM; i++) {
-    //     header.push(i * BIN_SIZE);
-    // }
-    // console.log(_.partial(printf, _.repeat("%-5d ", BIN_NUM)).apply(null, header));
-    // console.log(_.partial(printf, _.repeat("%-5.1f ", BIN_NUM)).apply(null, model.bins.map((a) => a.total ? 100 * a.wins / a.total : -1)));
 }
 
 function outputBins(all, fn) {
@@ -219,16 +209,12 @@ Promise.all([
     s.getMatches("lck15ar"),
     s.getMatches("lck15br"),
     s.getMatches("lck16ar"),
-    // s.getMatches("lck16br"),
-    // s.getMatches("na16br"),
-    // s.getMatches("eu16br"),
-    // s.getMatches("lpl16br"),
-    // s.getMatches("lms16br"),
-    s.getMatches("lck16b"),
-    s.getMatches("na16b"),
-    s.getMatches("eu16b"),
-    s.getMatches("lpl16b"),
-    s.getMatches("lms16b"),
+    s.getMatches("lpl16ar"),
+    s.getMatches("lck16br"),
+    s.getMatches("na16br"),
+    s.getMatches("eu16br"),
+    s.getMatches("lpl16br"),
+    s.getMatches("lms16br"),
     s.getMatches("lck17ar"),
     s.getMatches("na17ar"),
     s.getMatches("eu17ar"),
@@ -237,31 +223,47 @@ Promise.all([
     var lck15arM = a[0];
     var lck15brM = a[1];
     var lck16arM = a[2];
-    var lck16brM = a[3];
-    var na16brM = a[4];
-    var eu16brM = a[5];
-    var lpl16brM = a[6];
-    var lms16brM = a[7];
-    var lck17arM = a[8];
-    var na17arM = a[9];
-    var eu17arM = a[10];
-    var lpl17arM = a[11];
-    output("lms", lms16brM);
-    output("lpl", lpl16brM);
-    output("lck", lck16brM);
-    output("na", na16brM);
-    output("eu", eu16brM);
-    DEVIATION = 440;
-    outputBins(a.slice(1, 6), glicko_all);
+    var lpl16arM = a[3];
+    var lck16brM = a[4];
+    var na16brM = a[5];
+    var eu16brM = a[6];
+    var lpl16brM = a[7];
+    var lms16brM = a[8];
+    var lck17arM = a[9];
+    var na17arM = a[10];
+    var eu17arM = a[11];
+    var lpl17arM = a[12];
+    DEVIATION = 400;
+    BLUE_SIDE = 60;
+    output("lck15ar", lck15arM);
+    output("lck15br", lck15brM);
+    output("lck16ar", lck16arM);
+    output("lpl16ar", lpl16arM);
+    DEVIATION = 470;
+    BLUE_SIDE = 20;
+    output("na16br", na16brM);
+    output("eu16br", eu16brM);
+    output("lck16br", lck16brM);
+    output("lpl16br", lpl16brM);
+    output("lms16br", lms16brM);
+    DEVIATION = 470;
+    BLUE_SIDE = 100;
+    output("na17ar", na17arM);
+    output("eu17ar", eu17arM);
+    output("lck17ar", lck17arM);
+    output("lpl17ar", lpl17arM);
+    var br2016 = [na16brM, eu16brM, lck16brM, lpl16brM, lms16brM];
+    var ar2017 = [na17arM, eu17arM, lck17arM, lpl17arM];
+    outputBins(br2016, glicko_all);
     var t = [];
     for (let i = 0; i < 1; i += 5) {
         for (let j = 0; j < 200; j += 10) {
             DEVIATION = 400 + j;
             let k = {};
             BLUE_SIDE = 20;
-            k = scoreAll(a.slice(3, 8), glicko_week);
+            k = scoreAll(br2016, glicko_week2);
             // BLUE_SIDE = 100;
-            // k = scoreAll(a.slice(8, 12), glicko_week);
+            // k = scoreAll(ar2017, glicko_week);
             k.blue = i;
             k.dev = 400 + j;
             t.push(k);
