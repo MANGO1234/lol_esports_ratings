@@ -4,6 +4,7 @@ var _ = require('lodash');
 var glicko2 = require('glicko2');
 var printf = require('printf');
 var config = require('./matches/leagues.json');
+var sDefaults = require('./matches/defaults.json');
 
 function getMatches(key) {
     return new Promise(function(resolve, reject) {
@@ -30,8 +31,10 @@ function getMatches(key) {
     });
 }
 
-function calculateModel(matches, type, def) {
-    var ranking = new glicko2.Glicko2(def || {
+function calculateModel(matches, type, options) {
+    options = options || {};
+    var seasonDefaults = options.seasonDefaults || sDefaults;
+    var ranking = new glicko2.Glicko2(options.default || {
         tau: 0.6,
         rating: 1500,
         rd: 200,
@@ -40,13 +43,23 @@ function calculateModel(matches, type, def) {
 
     var players = {};
 
-    function getPlayer(name) {
+    function getPlayer(name, league) {
         shortName = namesTranslate[name] || name;
         if (!players[shortName]) {
+            var rating = ranking.makePlayer();
+            if (seasonDefaults[league]) {
+                if (seasonDefaults[league].A.teams.indexOf(shortName) > -1) {
+                    rating = ranking.makePlayer(seasonDefaults[league].A.defaultRating);
+                } else if (seasonDefaults[league].B.teams.indexOf(shortName) > -1) {
+                    rating = ranking.makePlayer(seasonDefaults[league].B.defaultRating);
+                } else {
+                    throw new Error(league + " has no default rating for " + shortName);
+                }
+            }
             players[shortName] = {
                 name: shortName,
                 fullName: name,
-                rating: ranking.makePlayer(),
+                rating: rating,
                 history: {}
             };
         }
@@ -54,7 +67,7 @@ function calculateModel(matches, type, def) {
     }
 
     if (type === 'ALL') {
-        ranking.updateRatings(matches.map((match) => [getPlayer(match.t1).rating, getPlayer(match.t2).rating, match.result]));
+        ranking.updateRatings(matches.map((match) => [getPlayer(match.t1, match.league).rating, getPlayer(match.t2, match.league).rating, match.result]));
         return {
             matches: matches,
             ranking: ranking,
@@ -65,7 +78,7 @@ function calculateModel(matches, type, def) {
         for (let i = 0; i < matches.length; i++) {
             let match = matches[i];
             ranking.updateRatings([
-                [getPlayer(match.t1).rating, getPlayer(match.t2).rating, match.result]
+                [getPlayer(match.t1, match.league).rating, getPlayer(match.t2, match.league).rating, match.result]
             ]);
         }
         return {
@@ -143,7 +156,7 @@ function calculateModel(matches, type, def) {
 
         for (let i = 0; i < ratingPeriods.length; i++) {
             var period = ratingPeriods[i];
-            ranking.updateRatings(period.matches.map((match) => [getPlayer(match.t1).rating, getPlayer(match.t2).rating, match.result]));
+            ranking.updateRatings(period.matches.map((match) => [getPlayer(match.t1, match.league).rating, getPlayer(match.t2, match.league).rating, match.result]));
             period.ratings = _.mapValues(players, function(player) {
                 return {
                     name: player.name,

@@ -1,0 +1,22 @@
+{
+    "lpl16br": {
+        "A": {
+            "defaultRating": 1500,
+            "teams": ["EDG", "SS", "GT", "IG", "NB", "SAT"]
+        },
+        "B": {
+            "defaultRating": 1500,
+            "teams": ["RNG", "WE", "IM", "VG", "LGD", "OMG"]
+        }
+    },
+    "eu17ar": {
+        "A": {
+            "defaultRating": 1500,
+            "teams": ["G2", "MSF", "FNC", "GIA", "ROC"]
+        },
+        "B": {
+            "defaultRating": 1500,
+            "teams": ["UOL", "H2K", "SPY", "VIT", "OG"]
+        }
+    }
+}
