@@ -20,7 +20,7 @@ elif key in config["combined"]:
 elif key == 'all':
     teams = list(config['tournaments'].keys())
 
-ms = list(map(dict, list(db.execute("select * from matches where league in ('" + "','".join(teams) + "') order by id"))))
+ms = list(map(dict, list(db.execute("select * from matches where league in ('" + "','".join(teams) + "') order by date,id"))))
 conn.commit()
 conn.close()
 

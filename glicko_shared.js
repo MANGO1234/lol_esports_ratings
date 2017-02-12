@@ -88,9 +88,43 @@ function calculateModel(matches, type) {
             } else if (new Date(match.date).getTime() - new Date(lastMatch.date).getTime() <= 25 * 60 * 60 * 1000) {
                 newPeriod.matches.push(match);
                 // fix: sometimes the days in the week is not consecutive
+            } else if (match.league === "lck15ar" && match.date === "2015-01-09") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-01-16") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-01-23") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-01-30") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-02-06") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-02-13") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-02-27") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-03-06") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-03-20") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-03-27") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-04-03") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15ar" && match.date === "2015-04-10") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15br" && match.date === "2015-06-05") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15br" && match.date === "2015-06-07") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15br" && match.date === "2015-06-19") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck15br" && match.date === "2015-07-24") {
+                newPeriod.matches.push(match);
             } else if (match.league === "lck17ar" && match.date === "2017-01-21") {
                 newPeriod.matches.push(match);
             } else if (match.league === "lck17ar" && match.date === "2017-02-04") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck17ar" && match.date === "2017-02-11") {
                 newPeriod.matches.push(match);
             } else {
                 newPeriod.endDate = newPeriod.matches[newPeriod.matches.length - 1].date;
