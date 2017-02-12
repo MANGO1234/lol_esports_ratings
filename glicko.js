@@ -15,9 +15,28 @@ if (process.argv[3] === '0') {
 }
 
 var key = process.argv[2];
-s.getMatches(key).then(calculateModel).then(function(model) {
+var matches;
+s.getMatches(key).then(function(ms) {
+    matches = ms;
+    return calculateModel(matches);
+}).then(function(model) {
     var players = model.players;
     var playersA = _.values(players);
+    for (let i = 0; i < playersA.length; i++) {
+        var p = playersA[i];
+        p.schedule = {
+            total: 0,
+            n: 0
+        };
+    }
+    for (let i = 0; i < matches.length; i++) {
+        var match = matches[i];
+        model.getPlayer(match.t1).schedule.total += model.getPlayer(match.t2).rating.getRating();
+        model.getPlayer(match.t1).schedule.n++;
+        model.getPlayer(match.t2).schedule.total += model.getPlayer(match.t1).rating.getRating();
+        model.getPlayer(match.t2).schedule.n++;
+    }
+
     playersA.sort(function(v1, v2) {
         return v2.rating.getRating() - v1.rating.getRating();
     });
@@ -36,10 +55,11 @@ s.getMatches(key).then(calculateModel).then(function(model) {
 
     stream.once('open', function() {
         write('**** Current Ratings ****');
-        write(printf('%-8s %-30s %-8s %-8s %-8s %-8s %-8s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max', 'Vol'));
+        write(printf('%-8s %-30s %-8s %-8s %-8s %-8s %-8s %-21s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max', 'Vol', 'Schedule Difficulty'));
         playersA.forEach(function(v, i) {
-            write(printf('%-8d %-30s %-8.1f %-8.1f %-8.1f %-8.1f %-8.5f', i + 1, v.fullName.substring(0, 30), v.rating.getRating(), v.rating.getRd() * 2,
-                v.rating.getRating() - v.rating.getRd() * 2, v.rating.getRating() + v.rating.getRd() * 2, v.rating.getVol()));
+            write(printf('%-8d %-30s %-8.1f %-8.1f %-8.1f %-8.1f %-8.5f %-8.1f', i + 1, v.fullName.substring(0, 30), v.rating.getRating(), v.rating.getRd() * 2,
+                v.rating.getRating() - v.rating.getRd() * 2, v.rating.getRating() + v.rating.getRd() * 2, v.rating.getVol(),
+                v.schedule.total / v.schedule.n));
         });
         write();
         var ratingsA = playersA.map((p) => p.rating.getRating());

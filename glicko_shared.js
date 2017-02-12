@@ -30,9 +30,9 @@ function getMatches(key) {
     });
 }
 
-function calculateModel(matches, type) {
-    var ranking = new glicko2.Glicko2({
-        tau: 0.7,
+function calculateModel(matches, type, def) {
+    var ranking = new glicko2.Glicko2(def || {
+        tau: 0.6,
         rating: 1500,
         rd: 200,
         vol: 0.06
