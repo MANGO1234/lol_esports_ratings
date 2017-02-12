@@ -119,6 +119,20 @@
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
             "finished": false
         },
+        "lpl16ar": {
+            "title": "LPL 2016 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202016%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "lpl16ap": {
+            "title": "LPL 2016 Spring Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202016%20Spring%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
         "lpl16br": {
             "title": "LPL 2016 Summer Split Regular Season",
             "type": "regular",
@@ -177,6 +191,7 @@
         "lck16a": ["lck16ar", "lck16ap"],
         "lck16b": ["lck16br", "lck16bp"],
         "lck": ["lck17ar"],
+        "lpl16a": ["lpl16ar", "lpl16ap"],
         "lpl16b": ["lpl16br", "lpl16bp"],
         "lpl": ["lpl17ar"],
         "lms16b": ["lms16br", "lms16bp"],
