@@ -26,15 +26,32 @@ s.getMatches(key).then(function(ms) {
         var p = playersA[i];
         p.schedule = {
             total: 0,
-            n: 0
+            n: 0,
+            win: 0,
+            winN: 0,
+            lose: 0,
+            loseN: 0,
         };
     }
     for (let i = 0; i < matches.length; i++) {
         var match = matches[i];
-        model.getPlayer(match.t1).schedule.total += model.getPlayer(match.t2).rating.getRating();
-        model.getPlayer(match.t1).schedule.n++;
-        model.getPlayer(match.t2).schedule.total += model.getPlayer(match.t1).rating.getRating();
-        model.getPlayer(match.t2).schedule.n++;
+        var p1 = model.getPlayer(match.t1);
+        var p2 = model.getPlayer(match.t2);
+        p1.schedule.total += p2.rating.getRating();
+        p1.schedule.n++;
+        p2.schedule.total += p1.rating.getRating();
+        p2.schedule.n++;
+        if (match.result) {
+            p1.schedule.win += p2.rating.getRating();
+            p1.schedule.winN++;
+            p2.schedule.lose += p1.rating.getRating();
+            p2.schedule.loseN++;
+        } else {
+            p2.schedule.win += p1.rating.getRating();
+            p2.schedule.winN++;
+            p1.schedule.lose += p2.rating.getRating();
+            p1.schedule.loseN++;
+        }
     }
 
     playersA.sort(function(v1, v2) {
@@ -55,11 +72,12 @@ s.getMatches(key).then(function(ms) {
 
     stream.once('open', function() {
         write('**** Current Ratings ****');
-        write(printf('%-8s %-30s %-8s %-8s %-8s %-8s %-8s %-21s', 'Ranking', 'Team', 'Rating', 'RD', 'Min', 'Max', 'Vol', 'Schedule Difficulty'));
+        write(printf('%-71s %-21s', '', 'Schedule Difficulty (Average Enemy Rating)'));
+        write(printf('%-4s %-30s %-8s %-8s %-8s %-8s %-12s %-12s %-12s', 'Rank', 'Team', 'Rating', 'RD', 'Min', 'Max', 'All (#games)', 'Win (#games)', 'Lose (#games)'));
         playersA.forEach(function(v, i) {
-            write(printf('%-8d %-30s %-8.1f %-8.1f %-8.1f %-8.1f %-8.5f %-8.1f', i + 1, v.fullName.substring(0, 30), v.rating.getRating(), v.rating.getRd() * 2,
-                v.rating.getRating() - v.rating.getRd() * 2, v.rating.getRating() + v.rating.getRd() * 2, v.rating.getVol(),
-                v.schedule.total / v.schedule.n));
+            write(printf('%-4d %-30s %-8.1f %-8.1f %-8.1f %-8.1f %-8.1f(%2d) %-8.1f(%2d) %-8.1f(%2d)', i + 1, v.fullName.substring(0, 30), v.rating.getRating(), v.rating.getRd() * 2,
+                v.rating.getRating() - v.rating.getRd() * 2, v.rating.getRating() + v.rating.getRd() * 2,
+                v.schedule.total / v.schedule.n, v.schedule.n, v.schedule.win / v.schedule.winN, v.schedule.winN, v.schedule.lose / v.schedule.loseN, v.schedule.loseN));
         });
         write();
         var ratingsA = playersA.map((p) => p.rating.getRating());
