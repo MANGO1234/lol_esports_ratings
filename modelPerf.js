@@ -3,10 +3,12 @@ var glicko2 = require('glicko2');
 var fs = require('fs');
 var printf = require('printf');
 var s = require('./glicko_shared.js');
-
+var sDefaults = require('./matches/defaults.json');
 
 var calculateModel = function(a, b) {
-    return s.calculateModel(a, b, T);
+    return s.calculateModel(a, b, {
+        default: T
+    });
 };
 var BIN_SIZE = 5;
 var BIN_NUM = 100 / BIN_SIZE + 1;
@@ -111,21 +113,21 @@ function t1Wins(data) {
 }
 
 function glicko_all(data) {
-    var model = calculateModel(data.matches, "ALL");
+    var model = calculateModel(data.matches, "ALL", sDefaults);
     var p1 = model.getPlayer(data.predict.t1);
     var p2 = model.getPlayer(data.predict.t2);
     return ratingToWinRate(p1, p2);
 }
 
 function glicko_single(data) {
-    var model = calculateModel(data.matches, "SINGLE");
+    var model = calculateModel(data.matches, "SINGLE", sDefaults);
     var p1 = model.getPlayer(data.predict.t1);
     var p2 = model.getPlayer(data.predict.t2);
     return ratingToWinRate(p1, p2);
 }
 
 function glicko_week(data) {
-    var model = calculateModel(data.matches);
+    var model = calculateModel(data.matches, "", sDefaults);
     var p1 = model.getPlayer(data.predict.t1);
     var p2 = model.getPlayer(data.predict.t2);
     return ratingToWinRate(p1, p2);
@@ -134,13 +136,13 @@ function glicko_week(data) {
 // doesn't change ratings during the period
 function glicko_week2(data) {
     data.matches.push(data.predict);
-    var model = calculateModel(data.matches);
+    var model = calculateModel(data.matches, "", sDefaults);
     var tmp = model.ratingPeriods.map((tmp) => tmp.matches);
     var k = [];
     for (let i = 0; i < tmp.length - 1; i++) {
         k = k.concat(tmp[i]);
     }
-    model = calculateModel(k);
+    model = calculateModel(k, "", sDefaults);
     var p1 = model.getPlayer(data.predict.t1);
     var p2 = model.getPlayer(data.predict.t2);
     return ratingToWinRate(p1, p2);
@@ -233,39 +235,60 @@ Promise.all([
     var na17arM = a[10];
     var eu17arM = a[11];
     var lpl17arM = a[12];
-    DEVIATION = 400;
-    BLUE_SIDE = 60;
-    output("lck15ar", lck15arM);
-    output("lck15br", lck15brM);
-    output("lck16ar", lck16arM);
-    output("lpl16ar", lpl16arM);
-    DEVIATION = 470;
-    BLUE_SIDE = 20;
-    output("na16br", na16brM);
-    output("eu16br", eu16brM);
-    output("lck16br", lck16brM);
-    output("lpl16br", lpl16brM);
-    output("lms16br", lms16brM);
-    DEVIATION = 470;
-    BLUE_SIDE = 100;
-    output("na17ar", na17arM);
-    output("eu17ar", eu17arM);
-    output("lck17ar", lck17arM);
-    output("lpl17ar", lpl17arM);
     var br2016 = [na16brM, eu16brM, lck16brM, lpl16brM, lms16brM];
     var ar2017 = [na17arM, eu17arM, lck17arM, lpl17arM];
-    outputBins(br2016, glicko_all);
+    var ch = 3;
     var t = [];
-    for (let i = 0; i < 1; i += 5) {
-        for (let j = 0; j < 200; j += 10) {
-            DEVIATION = 400 + j;
+    var todo = [eu17arM];
+    var group = sDefaults.eu17ar.A;
+    var fn = glicko_week2;
+    if (ch === 0) {
+        DEVIATION = 400;
+        BLUE_SIDE = 60;
+        output("lck15ar", lck15arM);
+        output("lck15br", lck15brM);
+        output("lck16ar", lck16arM);
+        output("lpl16ar", lpl16arM);
+        DEVIATION = 470;
+        BLUE_SIDE = 20;
+        output("na16br", na16brM);
+        output("eu16br", eu16brM);
+        output("lck16br", lck16brM);
+        output("lpl16br", lpl16brM);
+        output("lms16br", lms16brM);
+        DEVIATION = 470;
+        BLUE_SIDE = 100;
+        output("na17ar", na17arM);
+        output("eu17ar", eu17arM);
+        output("lck17ar", lck17arM);
+        output("lpl17ar", lpl17arM);
+        outputBins(br2016, glicko_all);
+    } else if (ch === 1) {
+        DEVIATION = 400;
+        for (let i = 0; i < 150; i += 5) {
             let k = {};
-            BLUE_SIDE = 20;
-            k = scoreAll(br2016, glicko_week2);
-            // BLUE_SIDE = 100;
-            // k = scoreAll(ar2017, glicko_week);
+            BLUE_SIDE = i;
+            k = scoreAll(todo, fn);
             k.blue = i;
-            k.dev = 400 + j;
+            t.push(k);
+        }
+    } else if (ch === 2) {
+        BLUE_SIDE = 100;
+        for (let i = 0; i < 300; i += 10) {
+            let k = {};
+            DEVIATION = 400 + i;
+            k = scoreAll(todo, fn);
+            k.deviation = 400 + i;
+            t.push(k);
+        }
+    } else if (ch === 3) {
+        DEVIATION = 470;
+        BLUE_SIDE = 100;
+        for (let i = -400; i < 400; i += 10) {
+            let k = {};
+            group.defaultRating = 1500 + i;
+            k = scoreAll(todo, fn);
+            k.rating = 1500 + i;
             t.push(k);
         }
     }
@@ -273,7 +296,6 @@ Promise.all([
         return a.score - b.score;
     });
     console.log(t);
-    console.log(1 / (1 + Math.pow(10, (-100) / DEVIATION)));
 }).catch(function(e) {
     console.log(e);
 });
