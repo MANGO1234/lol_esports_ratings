@@ -13,7 +13,7 @@ var calculateModel = function(a, b) {
 };
 var BIN_SIZE = 5;
 var BIN_NUM = 100 / BIN_SIZE + 1;
-var DEVIATION = 500;
+var DEVIATION = 400;
 var BLUE_SIDE = 20;
 var T = {
     tau: 0.5,
@@ -24,6 +24,10 @@ var T = {
 
 var g = function(variance) {
     return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / DEVIATION / Math.PI, 2) * variance);
+};
+
+var g = function() {
+    return 1;
 };
 
 var ratingToWinRate = function(p1, p2) {
@@ -166,7 +170,7 @@ function glicko_week2(data) {
 var gaussian = require("gaussian")(0, 1);
 
 function trueskillThroughTime(data) {
-    var lines = child_process.execSync('G:/other/ChessAnalysis/bin/Debug/ChessAnalysis.exe -no-safe -muS 1500 -sigmaS 300 -beta 200 -tauS 60 -muD 0 -sigmaD 0 ./out/matches.txt -N ' + data.matches.length).toString().split("\r\n");
+    var lines = child_process.execSync('G:/other/ChessAnalysis/bin/Debug/ChessAnalysis.exe -no-safe -muS 1500 -sigmaS 100 -beta 200 -tauS 60 -muD 0 -sigmaD 0 ./out/matches.txt -N ' + data.matches.length).toString().split("\r\n");
     var i = lines.indexOf("[Result]") + 1;
     var ratings = {};
     while (lines[i] !== "[End]" && i < lines.length) {
@@ -186,18 +190,18 @@ function trueskillThroughTime(data) {
         sigma: 300
     };
     var g = function(variance) {
-        return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / DEVIATION / Math.sqrt(2) / Math.PI, 2) * variance);
+        // return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / DEVIATION / Math.sqrt(2) / Math.PI, 2) * variance);
+        return 1;
     };
-    var ratingToWinRate = function(p1, p2) {
-        return 1 / (1 + Math.pow(10, g(p2.sigma * p2.sigma) * (p2.mu - p1.mu - BLUE_SIDE * Math.sqrt(2)) / DEVIATION / Math.sqrt(2)));
+    // var ratingToWinRate = function(p1, p2) {
+    //     return 1 / (1 + Math.pow(10, g(p2.sigma * p2.sigma) * (p2.mu - p1.mu - BLUE_SIDE * Math.sqrt(2)) / DEVIATION / Math.sqrt(2)));
+    // };
+    var ratingToWinRate = function(rA, rB) {
+        var deltaMu = rA.mu - rB.mu + BLUE_SIDE;
+        var sumSigma = rA.sigma * rA.sigma + rB.sigma * rB.sigma;
+        var denominator = Math.sqrt(4 * (200 * 200));
+        return gaussian.cdf(deltaMu / denominator);
     };
-    // function ratingToWinRate(rA, rB) {
-    //     var deltaMu = rA.mu - rB.mu + BLUE_SIDE;
-    //     var sumSigma = rA.sigma * rA.sigma + rB.sigma * rB.sigma;
-    //     var denominator = Math.sqrt(4 * (200 * 200) + sumSigma);
-    //     return gaussian.cdf(deltaMu / denominator);
-    // }
-
     // todo proper win rate???
     // console.log(p1.mu - p2.mu, ratingToWinRate(p1, p2));
     return ratingToWinRate(p1, p2);
@@ -294,10 +298,12 @@ Promise.all([
     var eu17arM = a[11];
     var lpl17arM = a[12];
     var br2016 = [na16brM, eu16brM, lck16brM, lpl16brM, lms16brM];
-    var ar2017 = [na17arM, eu17arM, lck17arM, lpl17arM];
+    var ar2017 = [na17arM, eu17arM, lck17arM];
+    var ar20172 = [na17arM, eu17arM, lck17arM, lpl17arM];
     var ch = 0;
     var t = [];
     var todo = [eu17arM];
+    // var todo = ar2017;
     var group = sDefaults.eu17ar.A;
     var fn = glicko_week2;
     if (ch === 0) {
@@ -307,19 +313,19 @@ Promise.all([
         // output("lck15br", lck15brM);
         // output("lck16ar", lck16arM);
         // output("lpl16ar", lpl16arM);
-        DEVIATION = 470;
+        DEVIATION = 400;
         BLUE_SIDE = 20;
         output("na16br", na16brM);
         output("eu16br", eu16brM);
         output("lck16br", lck16brM);
         output("lpl16br", lpl16brM);
         output("lms16br", lms16brM);
-        DEVIATION = 470;
+        DEVIATION = 400;
         BLUE_SIDE = 100;
         output("na17ar", na17arM);
         output("eu17ar", eu17arM);
         output("lck17ar", lck17arM);
-        // output("lpl17ar", lpl17arM);
+        output("lpl17ar", lpl17arM);
         outputBins(br2016, glicko_all);
     } else if (ch === 1) {
         DEVIATION = 400;
@@ -331,7 +337,7 @@ Promise.all([
             t.push(k);
         }
     } else if (ch === 2) {
-        BLUE_SIDE = 100;
+        BLUE_SIDE = 20;
         for (let i = 0; i < 300; i += 10) {
             let k = {};
             DEVIATION = 400 + i;
@@ -340,7 +346,7 @@ Promise.all([
             t.push(k);
         }
     } else if (ch === 3) {
-        DEVIATION = 470;
+        DEVIATION = 400;
         BLUE_SIDE = 100;
         for (let i = -400; i < 400; i += 10) {
             let k = {};
