@@ -16,7 +16,8 @@ if (process.argv[3] === '0') {
 
 var key = process.argv[2];
 var matches;
-s.getMatches(key).then(function(ms) {
+// s.getMatches(key).then(function(ms) {
+s.getMatchesWithDetails(key).then(s.transformMatches).then(function(ms) {
     matches = ms;
     return calculateModel(matches);
 }).then(function(model) {

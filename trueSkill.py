@@ -5,22 +5,21 @@ import sys
 
 import trueskill as ts
 
-conn = sql.connect('matches/matches.db')
-conn.row_factory = sql.Row
-db = conn.cursor()
-
 with open('matches/leagues.json') as data_file:
     config = json.load(data_file)
 
 key = sys.argv[1]
 if key in config["tournaments"]:
-    teams = [key]
+    leagues = [key]
 elif key in config["combined"]:
-    teams = config["combined"][key]
+    leagues = config["combined"][key]
 elif key == 'all':
-    teams = list(config['tournaments'].keys())
+    leagues = list(config['tournaments'].keys())
 
-ms = list(map(dict, list(db.execute("select * from matches where league in ('" + "','".join(teams) + "') order by date,id"))))
+conn = sql.connect('matches/matches.db')
+conn.row_factory = sql.Row
+db = conn.cursor()
+ms = list(map(dict, list(db.execute("select * from matches where league in ('" + "','".join(leagues) + "') order by date,id"))))
 conn.commit()
 conn.close()
 
@@ -49,7 +48,7 @@ def updatePlayerRatings(rs):
         players[n]["team"] = t
 
 
-ts.setup(draw_probability=0)
+ts.setup(mu=1500, sigma=300, beta=200, draw_probability=0)
 for m in ms:
     (t1p1, t1p2, t1p3, t1p4, t1p5), (t2p1, t2p2, t2p3, t2p4, t2p5) = ts.rate(
         [
@@ -110,7 +109,7 @@ tempTs = ts.TrueSkill()
 def winRate(rA, rB):
     deltaMu = rA.mu - rB.mu
     sumSigma = rA.sigma**2 + rB.sigma**2
-    denominator = math.sqrt(2 * (ts.BETA * ts.BETA) + sumSigma)
+    denominator = math.sqrt(4 * (200 * 200) + sumSigma)
     return tempTs.cdf(deltaMu / denominator)
 
 for m in ms:

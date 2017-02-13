@@ -22,7 +22,7 @@ s.getMatches(key).then(function(matches) {
             var id = 1;
             for (let j = 0; j < period.matches.length; j++) {
                 let match = period.matches[j];
-                stream.write(printf('%d,%d,%s,%s,%s\n', id, i, match.t1, match.t2, match.result ? "2,0" : "0,2"));
+                stream.write(printf('%d,%d,%s,%s,%s\n', id, i, match.t1, match.t2, match.result ? "1,0" : "0,1"));
                 id++;
             }
         }
