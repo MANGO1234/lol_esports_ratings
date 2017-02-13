@@ -57,9 +57,20 @@ function getMatchesWithDetails(key) {
 function transformMatches(matches) {
     for (let i = 0; i < matches.length; i++) {
         var match = matches[i];
-        if (match.data.gameDuration > 3000) {
-            // match.result = 0.5;
-        }
+        // if (match.data.teams) {
+        //     let t1 = match.data.teams[0].teamId;
+        //     let t2 = match.data.teams[1].teamId;
+        //     let t1kills = 0;
+        //     let t2kills = 0;
+        //     for (let i = 0; i < match.data.participants.length; i++) {
+        //         var p = match.data.participants[i];
+        //         if (p.teamId === t1) {
+        //             t1kills += p.stats.kills;
+        //         } else {
+        //             t2kills += p.stats.kills;
+        //         }
+        //     }
+        // }
     }
     return matches;
 }
@@ -218,7 +229,8 @@ var g = function(variance) {
 };
 
 function ratingToWinRate(p1, p2) {
-    return 1 / (1 + Math.pow(10, g(p2.rating.getRd() * p2.rating.getRd()) * (p2.rating.getRating() - p1.rating.getRating()) / BETA));
+    // return 1 / (1 + Math.pow(10, g(p2.rating.getRd() * p2.rating.getRd()) * (p2.rating.getRating() - p1.rating.getRating()) / BETA));
+    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / BETA));
 }
 
 function ratingToWinRate2(p1, p2) {
