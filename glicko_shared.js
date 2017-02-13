@@ -6,20 +6,22 @@ var printf = require('printf');
 var config = require('./matches/leagues.json');
 var sDefaults = require('./matches/defaults.json');
 
+function getLeagues(key) {
+    if (config.tournaments[key]) {
+        return [key];
+    } else if (config.combined[key]) {
+        return config.combined[key];
+    } else if (key === 'all') {
+        return Object.keys(config.tournaments);
+    }
+}
+
 function getMatches(key) {
     return new Promise(function(resolve, reject) {
-        var teams;
-        if (config.tournaments[key]) {
-            teams = [key];
-        } else if (config.combined[key]) {
-            teams = config.combined[key];
-        } else if (key === 'all') {
-            teams = Object.keys(config.tournaments);
-        }
-
+        var leagues = getLeagues(key);
         var db = new sqlite3.Database('./matches/matches.db');
         db.serialize(function() {
-            db.all("select * from matches where league in ('" + teams.join("','") + "') order by date,id", function(err, rows) {
+            db.all("select * from matches where league in ('" + leagues.join("','") + "') order by date,id", function(err, rows) {
                 if (err) {
                     reject(err);
                 } else {
@@ -29,6 +31,37 @@ function getMatches(key) {
             });
         });
     });
+}
+
+function getMatchesWithDetails(key) {
+    return new Promise(function(resolve, reject) {
+        var leagues = getLeagues(key);
+        var db = new sqlite3.Database('./matches/matches.db');
+        db.serialize(function() {
+            db.all("select * from matches m left natural join details d where m.league in ('" + leagues.join("','") + "') order by m.date,m.id", function(err, rows) {
+                if (err) {
+                    reject(err);
+                } else {
+                    for (let i = 0; i < rows.length; i++) {
+                        var row = rows[i];
+                        row.data = JSON.parse(row.data || "{}");
+                    }
+                    resolve(rows);
+                }
+                db.close();
+            });
+        });
+    });
+}
+
+function transformMatches(matches) {
+    for (let i = 0; i < matches.length; i++) {
+        var match = matches[i];
+        if (match.data.gameDuration > 3000) {
+            // match.result = 0.5;
+        }
+    }
+    return matches;
 }
 
 function calculateModel(matches, type, options) {
@@ -193,7 +226,10 @@ function ratingToWinRate2(p1, p2) {
 }
 
 module.exports = {
+    getLeagues: getLeagues,
     getMatches: getMatches,
+    getMatchesWithDetails: getMatchesWithDetails,
+    transformMatches: transformMatches,
     calculateModel: calculateModel,
     ratingToWinRate: ratingToWinRate,
     g: g,

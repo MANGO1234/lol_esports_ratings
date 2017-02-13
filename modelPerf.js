@@ -4,6 +4,7 @@ var fs = require('fs');
 var printf = require('printf');
 var s = require('./glicko_shared.js');
 var sDefaults = require('./matches/defaults.json');
+var child_process = require('child_process');
 
 var calculateModel = function(a, b) {
     return s.calculateModel(a, b, {
@@ -38,6 +39,20 @@ function runModel(scoring, model, matches, n) {
             expected: 0,
             total: 0
         };
+    }
+    if (model.writeFile) {
+        var m = s.calculateModel(matches);
+        var str = "";
+        for (let i = 0; i < m.ratingPeriods.length; i++) {
+            var period = m.ratingPeriods[i];
+            var id = 1;
+            for (let j = 0; j < period.matches.length; j++) {
+                let match = period.matches[j];
+                str += (printf('%d,%d,%s,%s,%s\n', id, i, match.t1, match.t2, match.result ? "1,0" : "0,1"));
+                id++;
+            }
+        }
+        fs.writeFileSync("out/matches.txt", str);
     }
     for (let i = n; i < matches.length - 1; i++) {
         var subset = matches.slice(0, i);
@@ -148,20 +163,60 @@ function glicko_week2(data) {
     return ratingToWinRate(p1, p2);
 }
 
+var gaussian = require("gaussian")(0, 1);
+
+function trueskillThroughTime(data) {
+    var lines = child_process.execSync('G:/other/ChessAnalysis/bin/Debug/ChessAnalysis.exe -no-safe -muS 1500 -sigmaS 300 -beta 200 -tauS 60 -muD 0 -sigmaD 0 ./out/matches.txt -N ' + data.matches.length).toString().split("\r\n");
+    var i = lines.indexOf("[Result]") + 1;
+    var ratings = {};
+    while (lines[i] !== "[End]" && i < lines.length) {
+        var line = lines[i].split(",");
+        ratings[line[1]] = {
+            mu: parseFloat(line[2]),
+            sigma: parseFloat(line[3])
+        };
+        i++;
+    }
+    var p1 = ratings[data.predict.t1] || {
+        mu: 1500,
+        sigma: 300
+    };
+    var p2 = ratings[data.predict.t2] || {
+        mu: 1500,
+        sigma: 300
+    };
+    var g = function(variance) {
+        return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / DEVIATION / Math.sqrt(2) / Math.PI, 2) * variance);
+    };
+    var ratingToWinRate = function(p1, p2) {
+        return 1 / (1 + Math.pow(10, g(p2.sigma * p2.sigma) * (p2.mu - p1.mu - BLUE_SIDE * Math.sqrt(2)) / DEVIATION / Math.sqrt(2)));
+    };
+    // function ratingToWinRate(rA, rB) {
+    //     var deltaMu = rA.mu - rB.mu + BLUE_SIDE;
+    //     var sumSigma = rA.sigma * rA.sigma + rB.sigma * rB.sigma;
+    //     var denominator = Math.sqrt(4 * (200 * 200) + sumSigma);
+    //     return gaussian.cdf(deltaMu / denominator);
+    // }
+
+    // todo proper win rate???
+    // console.log(p1.mu - p2.mu, ratingToWinRate(p1, p2));
+    return ratingToWinRate(p1, p2);
+}
+trueskillThroughTime.writeFile = true;
+
 // analysis
 function output(league, matches) {
     console.log(league);
     var start = Math.round(matches.length / 2);
     var model = null;
-    BLUE_SIDE = 15;
     model = runModel(BrierScore(), glicko_all, matches, start);
-    console.log(model.getScore());
-    BLUE_SIDE = 15;
+    console.log(model.getScore() + "(" + model.n + ")");
     model = runModel(BrierScore(), glicko_week, matches, start);
-    console.log(model.getScore());
-    BLUE_SIDE = 15;
+    console.log(model.getScore() + "(" + model.n + ")");
     model = runModel(BrierScore(), glicko_week2, matches, start);
-    console.log(model.getScore());
+    console.log(model.getScore() + "(" + model.n + ")");
+    // model = runModel(BrierScore(), trueskillThroughTime, matches, start);
+    // console.log(model.getScore() + "(" + model.n + ")");
     console.log();
 }
 
@@ -206,21 +261,24 @@ function scoreAll(all, fn) {
     };
 }
 
+var getMatches = function(k) {
+    return s.getMatchesWithDetails(k).then(s.transformMatches);
+};
 
 Promise.all([
-    s.getMatches("lck15ar"),
-    s.getMatches("lck15br"),
-    s.getMatches("lck16ar"),
-    s.getMatches("lpl16ar"),
-    s.getMatches("lck16br"),
-    s.getMatches("na16br"),
-    s.getMatches("eu16br"),
-    s.getMatches("lpl16br"),
-    s.getMatches("lms16br"),
-    s.getMatches("lck17ar"),
-    s.getMatches("na17ar"),
-    s.getMatches("eu17ar"),
-    s.getMatches("lpl17ar")
+    getMatches("lck15ar"),
+    getMatches("lck15br"),
+    getMatches("lck16ar"),
+    getMatches("lpl16ar"),
+    getMatches("lck16br"),
+    getMatches("na16br"),
+    getMatches("eu16br"),
+    getMatches("lpl16br"),
+    getMatches("lms16br"),
+    getMatches("lck17ar"),
+    getMatches("na17ar"),
+    getMatches("eu17ar"),
+    getMatches("lpl17ar")
 ]).then(function(a) {
     var lck15arM = a[0];
     var lck15brM = a[1];
@@ -237,7 +295,7 @@ Promise.all([
     var lpl17arM = a[12];
     var br2016 = [na16brM, eu16brM, lck16brM, lpl16brM, lms16brM];
     var ar2017 = [na17arM, eu17arM, lck17arM, lpl17arM];
-    var ch = 3;
+    var ch = 0;
     var t = [];
     var todo = [eu17arM];
     var group = sDefaults.eu17ar.A;
@@ -245,10 +303,10 @@ Promise.all([
     if (ch === 0) {
         DEVIATION = 400;
         BLUE_SIDE = 60;
-        output("lck15ar", lck15arM);
-        output("lck15br", lck15brM);
-        output("lck16ar", lck16arM);
-        output("lpl16ar", lpl16arM);
+        // output("lck15ar", lck15arM);
+        // output("lck15br", lck15brM);
+        // output("lck16ar", lck16arM);
+        // output("lpl16ar", lpl16arM);
         DEVIATION = 470;
         BLUE_SIDE = 20;
         output("na16br", na16brM);
@@ -261,7 +319,7 @@ Promise.all([
         output("na17ar", na17arM);
         output("eu17ar", eu17arM);
         output("lck17ar", lck17arM);
-        output("lpl17ar", lpl17arM);
+        // output("lpl17ar", lpl17arM);
         outputBins(br2016, glicko_all);
     } else if (ch === 1) {
         DEVIATION = 400;
