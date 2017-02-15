@@ -26,12 +26,8 @@ var g = function(variance) {
     return 1 / Math.sqrt(1 + 3 * Math.pow(Math.log(10) / DEVIATION / Math.PI, 2) * variance);
 };
 
-var g = function() {
-    return 1;
-};
-
 var ratingToWinRate = function(p1, p2) {
-    return 1 / (1 + Math.pow(10, g(p2.rating.getRd() * p2.rating.getRd()) * (p2.rating.getRating() - p1.rating.getRating() - BLUE_SIDE) / DEVIATION));
+    return 1 / (1 + Math.pow(10, g(p2.rating.getRd() * p2.rating.getRd() + p1.rating.getRd() * p1.rating.getRd()) * (p2.rating.getRating() - p1.rating.getRating() - BLUE_SIDE) / DEVIATION));
 };
 
 function runModel(scoring, model, matches, n) {
@@ -194,7 +190,7 @@ function trueskillThroughTime(data) {
         return 1;
     };
     // var ratingToWinRate = function(p1, p2) {
-    //     return 1 / (1 + Math.pow(10, g(p2.sigma * p2.sigma) * (p2.mu - p1.mu - BLUE_SIDE * Math.sqrt(2)) / DEVIATION / Math.sqrt(2)));
+    //     return 1 / (1 + Math.pow(10, g(p1.sigma*p1.sigma+ p2.sigma * p2.sigma) * (p2.mu - p1.mu - BLUE_SIDE * Math.sqrt(2)) / DEVIATION / Math.sqrt(2)));
     // };
     var ratingToWinRate = function(rA, rB) {
         var deltaMu = rA.mu - rB.mu + BLUE_SIDE;
@@ -300,19 +296,18 @@ Promise.all([
     var br2016 = [na16brM, eu16brM, lck16brM, lpl16brM, lms16brM];
     var ar2017 = [na17arM, eu17arM, lck17arM];
     var ar20172 = [na17arM, eu17arM, lck17arM, lpl17arM];
-    var ch = 0;
+    var ch = 2;
     var t = [];
-    var todo = [eu17arM];
-    // var todo = ar2017;
+    var todo = ar2017;
     var group = sDefaults.eu17ar.A;
     var fn = glicko_week2;
     if (ch === 0) {
         DEVIATION = 400;
         BLUE_SIDE = 60;
-        // output("lck15ar", lck15arM);
-        // output("lck15br", lck15brM);
-        // output("lck16ar", lck16arM);
-        // output("lpl16ar", lpl16arM);
+        output("lck15ar", lck15arM);
+        output("lck15br", lck15brM);
+        output("lck16ar", lck16arM);
+        output("lpl16ar", lpl16arM);
         DEVIATION = 400;
         BLUE_SIDE = 20;
         output("na16br", na16brM);
@@ -337,7 +332,7 @@ Promise.all([
             t.push(k);
         }
     } else if (ch === 2) {
-        BLUE_SIDE = 20;
+        BLUE_SIDE = 100;
         for (let i = 0; i < 300; i += 10) {
             let k = {};
             DEVIATION = 400 + i;

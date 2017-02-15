@@ -229,8 +229,7 @@ var g = function(variance) {
 };
 
 function ratingToWinRate(p1, p2) {
-    // return 1 / (1 + Math.pow(10, g(p2.rating.getRd() * p2.rating.getRd()) * (p2.rating.getRating() - p1.rating.getRating()) / BETA));
-    return 1 / (1 + Math.pow(10, (p2.rating.getRating() - p1.rating.getRating()) / BETA));
+    return 1 / (1 + Math.pow(10, g(p1.rating.getRd() * p1.rating.getRd() + p2.rating.getRd() * p2.rating.getRd()) * (p2.rating.getRating() - p1.rating.getRating()) / BETA));
 }
 
 function ratingToWinRate2(p1, p2) {
