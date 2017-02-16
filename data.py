@@ -1,97 +1,92 @@
-import _sqlite3 as sql
+import sqlite3 as sql
 import json
-import sys
 import time
+
+import numpy as np
+import pandas as pd
 
 with open('matches/leagues.json') as data_file:
     config = json.load(data_file)
-with open('matches/names.json') as data_file:
-    namesTranslate = json.load(data_file)
+
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
 
 
-class Matches():
+class Games():
 
-    def __init__(self, rawLeagues):
-        self.rawLeagues = rawLeagues
+    def __init__(self, rawGames):
+        self.rawGames = rawGames
+        rawGames['period'] = np.nan
+        rawGames['match'] = 0
+        rawGames['matchLeague'] = 0
+        rawGames['matchAll'] = 0
+        rawGames['matchGame'] = 0
+        rawGames['timestamp'] = rawGames['date'].map(lambda row: time.mktime(time.strptime(row, '%Y-%m-%d')))
+        rawGames.sort_values(['league', 'date', 'id'], ascending=True, inplace=True)
+        rawGames.reset_index(drop=True, inplace=True)
 
-        def addTeam(teams, name):
-            if name in namesTranslate:
-                shortName = namesTranslate[name]
-            else:
-                shortName = name
-            if shortName not in teams:
-                teams[shortName] = {
-                    'name': shortName,
-                    'fullName': name
-                }
+        # fix: sometimes the days in the week is not consecutive
+        ignoreGames = {
+            ('lck15ar', '2015-01-09'),
+            ('lck15ar', '2015-01-16'),
+            ('lck15ar', '2015-01-23'),
+            ('lck15ar', '2015-01-30'),
+            ('lck15ar', '2015-02-06'),
+            ('lck15ar', '2015-02-13'),
+            ('lck15ar', '2015-02-27'),
+            ('lck15ar', '2015-03-06'),
+            ('lck15ar', '2015-03-20'),
+            ('lck15ar', '2015-03-27'),
+            ('lck15ar', '2015-04-03'),
+            ('lck15ar', '2015-04-10'),
+            ('lck15br', '2015-06-05'),
+            ('lck15br', '2015-06-07'),
+            ('lck15br', '2015-06-19'),
+            ('lck15br', '2015-07-24'),
+            ('lck17ar', '2017-01-21'),
+            ('lck17ar', '2017-02-04'),
+            ('lck17ar', '2017-02-11')
+        }
 
-        def toPeriods(matches):
-            periods = []
-            newPeriod = {
-                'matches': []
-            }
-            lastMatch = None
-            firstMatch = True
-            for match in matches:
-                if firstMatch:
-                    newPeriod['startDate'] = match['date']
-                    newPeriod['matches'].append(match)
-                    firstMatch = False
-                else:
-                    matchDate = time.strptime(match['date'], '%y-%m-%d')
-                    lastMatchDate = time.strptime(lastMatch['date'], '%y-%m-%d')
-                    print(time.mktime(matchDate.date()))
-                    if time.mktime(matchDate.date()) - time.mktime(lastMatchDate.date()) <= 25 * 60 * 60 * 1000:
-                        newPeriod.matches.append(match)
-                    # fix: sometimes the days in the week is not consecutive
-                    elif ((match['league'] == "lck15ar" and match['date'] == "2015-01-09")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-01-16")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-01-23")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-01-30")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-02-06")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-02-13")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-02-27")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-03-06")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-03-20")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-03-27")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-04-03")
-                          or (match['league'] == "lck15ar" and match['date'] == "2015-04-10")
-                          or (match['league'] == "lck15br" and match['date'] == "2015-06-05")
-                          or (match['league'] == "lck15br" and match['date'] == "2015-06-07")
-                          or (match['league'] == "lck15br" and match['date'] == "2015-06-19")
-                          or (match['league'] == "lck15br" and match['date'] == "2015-07-24")
-                          or (match['league'] == "lck17ar" and match['date'] == "2017-01-21")
-                          or (match['league'] == "lck17ar" and match['date'] == "2017-02-04")
-                          or (match['league'] == "lck17ar" and match['date'] == "2017-02-11")):
-                        newPeriod.matches.append(match)
-                    else:
-                        newPeriod['endDate'] = newPeriod['matches'][len(newPeriod.matches) - 1]['date']
-                        periods.append(newPeriod)
-                        newPeriod = {
-                            'matches': [match],
-                            'startDate': match.date
-                        }
-                lastMatch = match
+        for league, games in rawGames.groupby('league'):
+            period = 1
+            start = games.index[0]
+            for i in games.index:
+                if i != start and games.ix[i, 'timestamp'] - games.ix[i - 1, 'timestamp'] > 25 * 60 * 60 and (league, games.ix[i, 'date']) not in ignoreGames:
+                    period += 1
+                rawGames.set_value(i, 'period', period)
 
-            if len(newPeriod['matches']):
-                newPeriod['endDate'] = newPeriod['matches'][len(newPeriod['matches']) - 1]['date']
-                periods.append(newPeriod)
-            print(len(periods[0]['matches']))
-            return periods
+        matchAll = 1
+        matchLeagues = {}
+        for (league, period), games in rawGames.groupby(['league', 'period']):
+            match = 1
+            if league not in matchLeagues:
+                matchLeagues[league] = 1
+            indexes = games.index
+            for k in range(0, len(indexes)):
+                i = indexes[k]
+                if rawGames.ix[i, 'match'] == 0:
+                    rawGames.set_value(i, 'match', match)
+                    rawGames.set_value(i, 'matchLeague', matchLeagues[league])
+                    rawGames.set_value(i, 'matchAll', matchAll)
+                    rawGames.set_value(i, 'matchGame', 1)
+                    t1 = games.ix[i, 't1']
+                    t2 = games.ix[i, 't2']
+                    matchGame = 2
+                    for l in range(i + 1, len(indexes)):
+                        j = indexes[l]
+                        if (games.ix[j, 't1'] == t1 and games.ix[j, 't2'] == t2) or (games.ix[j, 't1'] == t2 and games.ix[j, 't2'] == t1):
+                            rawGames.set_value(j, 'match', match)
+                            rawGames.set_value(j, 'matchLeague', matchLeagues[league])
+                            rawGames.set_value(j, 'matchAll', matchAll)
+                            rawGames.set_value(j, 'matchGame', matchGame)
+                            matchGame += 1
+                    match += 1
+                    matchLeagues[league] += 1
+                    matchAll += 1
 
-        leagues = {}
-        for league in rawLeagues:
-            teams = {}
-            for match in league['matches']:
-                addTeam(teams, match['t1'])
-                addTeam(teams, match['t2'])
-            periods = toPeriods(league['matches'])
-            leagues[league['league']] = {
-                'rawMatches': league['matches'],
-                'teams': teams,
-                'periods': periods
-            }
-        self.leagues = leagues
+    def getGames(self):
+        return self.rawGames
 
 
 def getLeagues(key):
@@ -105,19 +100,6 @@ def getLeagues(key):
         raise Exception("Key not find")
 
 
-def getMatches(leagues):
-    conn = sql.connect('matches/matches.db')
-    conn.row_factory = sql.Row
-    db = conn.cursor()
-    matches = []
-    for league in leagues:
-        matches.append({
-            'league': league,
-            'matches': list(map(dict, list(db.execute("select * from matches where league in ('" + league + "') order by date,id"))))
-        })
-    conn.close()
-    return Matches(matches)
-
-
-key = sys.argv[1]
-getMatches(getLeagues(key)).leagues
+def getGames(leagues):
+    with sql.connect('matches/matches.db') as con:
+        return Games(pd.read_sql_query("select * from matches where league in ('" + "','".join(leagues) + "')", con))
