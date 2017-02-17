@@ -1,1 +1,0 @@
-node glicko.js na & node glicko.js eu & node glicko.js lck & node glicko.js lpl & node glicko.js lms
