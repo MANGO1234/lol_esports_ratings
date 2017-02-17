@@ -16,7 +16,7 @@ class Games():
 
     def __init__(self, rawGames):
         self.rawGames = rawGames
-        rawGames['period'] = np.nan
+        rawGames['period'] = 0
         rawGames['match'] = 0
         rawGames['matchLeague'] = 0
         rawGames['matchAll'] = 0
@@ -73,7 +73,7 @@ class Games():
                     t1 = games.ix[i, 't1']
                     t2 = games.ix[i, 't2']
                     matchGame = 2
-                    for l in range(i + 1, len(indexes)):
+                    for l in range(k + 1, len(indexes)):
                         j = indexes[l]
                         if (games.ix[j, 't1'] == t1 and games.ix[j, 't2'] == t2) or (games.ix[j, 't1'] == t2 and games.ix[j, 't2'] == t1):
                             rawGames.set_value(j, 'match', match)
