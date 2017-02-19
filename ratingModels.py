@@ -117,7 +117,7 @@ class TrueskillModelPeriod():
         return r.sigma
 
 
-class GlickoModelPerGame():
+class GlickoModel():
 
     @staticmethod
     def applyModel(allGames, games, teams):
@@ -130,10 +130,17 @@ class GlickoModelPerGame():
         if 'snapshot' not in allGames:
             allGames['snapshot'] = 0
         allGames['snapshot'] = allGames['snapshot'].astype(dict)
-        for i in games.index:
-            allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
-            glicko.updatePeriod(ratings, [(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], games.ix[i, 'result'])])
-            allGames.set_value(i, 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
+        for period, periodGames in games.groupby("period"):
+            snapshot = {k: v['rating'].clone() for k, v in teams.items()}
+            for i in periodGames.index:
+                allGames.set_value(i, 'expected', glickoExpectedWinRate(snapshot[games.ix[i, 't1']], snapshot[games.ix[i, 't2']]))
+                glicko.updateResults([(snapshot[games.ix[i, 't1']], snapshot[games.ix[i, 't2']], games.ix[i, 'result'])])
+                allGames.set_value(i, 'snapshot', {k: v.clone() for k, v in snapshot.items()})
+            g = []
+            for i in periodGames.index:
+                g.append((teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], games.ix[i, 'result']))
+            glicko.updatePeriod(ratings, g)
+            allGames.set_value(periodGames.index[-1], 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
 
     @staticmethod
     def expectedWinRate(r1, r2):
@@ -148,7 +155,7 @@ class GlickoModelPerGame():
         return r.getRd()
 
 
-class GlickoModelPerGame2():
+class GlickoModelPerGame():
 
     @staticmethod
     def applyModel(allGames, games, teams):

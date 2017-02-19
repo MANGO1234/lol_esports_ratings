@@ -2,7 +2,6 @@ import sqlite3 as sql
 import json
 import time
 
-import numpy as np
 import pandas as pd
 
 with open('matches/leagues.json') as data_file:
@@ -86,7 +85,7 @@ class Games():
                     matchAll += 1
 
     def getGames(self):
-        return self.rawGames
+        return self.rawGames.copy()
 
 
 def getLeagues(key):

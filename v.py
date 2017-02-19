@@ -21,12 +21,11 @@ key = sys.argv[1]
 def winRateBo1ToBo3(p):
     return p * p * (3 - 2 * p)
 
+
+model = m.GlickoModelPeriod
+model = m.GlickoModelPerGame
 model = m.TrueskillModel
 model = m.TrueskillModelPeriod
-model = m.GlickoModelPerGame
-model = m.GlickoModelPeriod
-model = m.GlickoModelPerGame2
-
 
 data = getGames(getLeagues(key))
 allGames = data.getGames()
@@ -37,5 +36,34 @@ for league, games in allGames.groupby('league'):
     leagueTeams[league] = teams
 
 for league, games in allGames.groupby("league"):
-    games = games[(games['period'] > 4)]
-    print(league + ": " + str(((games['expected'] - games['result'])**2).mean()))
+    print(league)
+    g = games[(games['period'] > 4)]
+    print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
+    g = games[(games['period'] > 4) & (games['matchGame'] == 1)]
+    print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
+    g = games[(games['period'] > 4) & (games['matchGame'] == 2)]
+    print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
+    g = games[(games['period'] > 4) & (games['matchGame'] == 3)]
+    print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
+
+
+model = m.GlickoModel
+
+data = getGames(getLeagues(key))
+allGames = data.getGames()
+leagueTeams = {}
+for league, games in allGames.groupby('league'):
+    teams = m.getTeams(games)
+    model.applyModel(allGames, games, teams)
+    leagueTeams[league] = teams
+
+for league, games in allGames.groupby("league"):
+    print(league)
+    g = games[(games['period'] > 4)]
+    print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
+    g = games[(games['period'] > 4) & (games['matchGame'] == 1)]
+    print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
+    g = games[(games['period'] > 4) & (games['matchGame'] == 2)]
+    print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
+    g = games[(games['period'] > 4) & (games['matchGame'] == 3)]
+    print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
