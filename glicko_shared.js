@@ -79,7 +79,7 @@ function calculateModel(matches, type, options) {
     options = options || {};
     var seasonDefaults = options.seasonDefaults || sDefaults;
     var ranking = new glicko2.Glicko2(options.default || {
-        tau: 0.6,
+        tau: 0.5,
         rating: 1500,
         rd: 200,
         vol: 0.06

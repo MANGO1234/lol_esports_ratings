@@ -48,7 +48,7 @@ class Player:
 
     rd = property(getRd, setRd)
 
-    def __init__(self, rating=1500, rd=350, vol=0.06):
+    def __init__(self, rating=1500, rd=200, vol=0.06):
         # For testing purposes, preload the values
         # assigned to an unrated player.
         self.setRating(rating)
@@ -71,6 +71,10 @@ class Player:
 
         """
         # Convert the rating and rating deviation values for internal use.
+        if len(rating_list) == 0:
+            self._preRatingRD()
+            return
+
         rating_list = [(x - 1500) / 173.7178 for x in rating_list]
         RD_list = [x / 173.7178 for x in RD_list]
 
