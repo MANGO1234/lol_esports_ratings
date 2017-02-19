@@ -17,6 +17,7 @@ allGames = data.getGames()
 model = m.TrueskillModel
 model = m.TrueskillModelPeriod
 model = m.GlickoModelPerGame
+model = m.GlickoModelPeriod
 
 
 def winRateBo1ToBo3(p):

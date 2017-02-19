@@ -1,3 +1,4 @@
+import math
 import json
 import sys
 
@@ -16,13 +17,15 @@ with open('matches/leagues.json') as data_file:
 
 key = sys.argv[1]
 
-model = m.TrueskillModel
-model = m.TrueskillModelPeriod
-model = m.GlickoModelPerGame
-
 
 def winRateBo1ToBo3(p):
     return p * p * (3 - 2 * p)
+
+model = m.TrueskillModel
+model = m.TrueskillModelPeriod
+model = m.GlickoModelPerGame
+model = m.GlickoModelPeriod
+model = m.GlickoModelPerGame2
 
 
 data = getGames(getLeagues(key))
@@ -34,6 +37,5 @@ for league, games in allGames.groupby('league'):
     leagueTeams[league] = teams
 
 for league, games in allGames.groupby("league"):
-    # games = games[(games['period'] > 4)]
-    games = games[(games['period'] >= 4)]
+    games = games[(games['period'] > 4)]
     print(league + ": " + str(((games['expected'] - games['result'])**2).mean()))

@@ -132,6 +132,35 @@ class GlickoModelPerGame():
         allGames['snapshot'] = allGames['snapshot'].astype(dict)
         for i in games.index:
             allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
+            glicko.updatePeriod(ratings, [(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], games.ix[i, 'result'])])
+            allGames.set_value(i, 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
+
+    @staticmethod
+    def expectedWinRate(r1, r2):
+        return glickoExpectedWinRate(r1, r2)
+
+    @staticmethod
+    def getRatingMu(r):
+        return r.getRating()
+
+    @staticmethod
+    def getRatingSigma(r):
+        return r.getRd()
+
+
+class GlickoModelPerGame2():
+
+    @staticmethod
+    def applyModel(allGames, games, teams):
+        for team in teams:
+            teams[team]['rating'] = glicko.Player()
+        if 'expected' not in allGames:
+            allGames['expected'] = np.nan
+        if 'snapshot' not in allGames:
+            allGames['snapshot'] = 0
+        allGames['snapshot'] = allGames['snapshot'].astype(dict)
+        for i in games.index:
+            allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
             glicko.updateResults([(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], games.ix[i, 'result'])])
             allGames.set_value(i, 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
 
@@ -152,18 +181,25 @@ class GlickoModelPeriod():
 
     @staticmethod
     def applyModel(allGames, games, teams):
+        ratings = []
         for team in teams:
             teams[team]['rating'] = glicko.Player()
+            ratings.append(teams[team]['rating'])
         if 'expected' not in allGames:
             allGames['expected'] = np.nan
         if 'snapshot' not in allGames:
             allGames['snapshot'] = 0
         allGames['snapshot'] = allGames['snapshot'].astype(dict)
-        for i in games.index:
-            allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
-            print(games.ix[i, 'result'])
-            glicko.updateResults([(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], games.ix[i, 'result'])])
-            allGames.set_value(i, 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
+        for period, periodGames in games.groupby("period"):
+            for i in periodGames.index:
+                allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
+            for i in periodGames.index:
+                allGames.set_value(i, 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
+            g = []
+            for i in periodGames.index:
+                g.append((teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], games.ix[i, 'result']))
+            glicko.updatePeriod(ratings, g)
+            allGames.set_value(periodGames.index[-1], 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
 
     @staticmethod
     def expectedWinRate(r1, r2):
