@@ -14,7 +14,9 @@ key = sys.argv[1]
 data = getGames(getLeagues(key))
 allGames = data.getGames()
 
-model = m.trueskillModel
+model = m.TrueskillModel
+model = m.TrueskillModelPeriod
+model = m.GlickoModelPerGame
 
 
 def winRateBo1ToBo3(p):

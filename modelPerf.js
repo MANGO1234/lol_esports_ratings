@@ -207,7 +207,7 @@ trueskillThroughTime.writeFile = true;
 // analysis
 function output(league, matches) {
     console.log(league);
-    var start = Math.round(matches.length / 2);
+    var start = Math.min(Math.round(matches.length / 2), 100);
     var model = null;
     model = runModel(BrierScore(), glicko_all, matches, start);
     console.log(model.getScore() + "(" + model.n + ")");
@@ -296,9 +296,9 @@ Promise.all([
     var br2016 = [na16brM, eu16brM, lck16brM, lpl16brM, lms16brM];
     var ar2017 = [na17arM, eu17arM, lck17arM];
     var ar20172 = [na17arM, eu17arM, lck17arM, lpl17arM];
-    var ch = 2;
+    var ch = 0;
     var t = [];
-    var todo = ar2017;
+    var todo = br2016;
     var group = sDefaults.eu17ar.A;
     var fn = glicko_week2;
     if (ch === 0) {

@@ -15,23 +15,25 @@ with open('matches/leagues.json') as data_file:
     config = json.load(data_file)
 
 key = sys.argv[1]
-data = getGames(getLeagues(key))
-allGames = data.getGames()
 
-model = m.trueskillModel
+model = m.TrueskillModel
+model = m.TrueskillModelPeriod
+model = m.GlickoModelPerGame
 
 
 def winRateBo1ToBo3(p):
     return p * p * (3 - 2 * p)
 
 
+data = getGames(getLeagues(key))
+allGames = data.getGames()
 leagueTeams = {}
 for league, games in allGames.groupby('league'):
     teams = m.getTeams(games)
     model.applyModel(allGames, games, teams)
     leagueTeams[league] = teams
 
-# allGames = allGames[(allGames['matchGame'] == 1) & (allGames['period'] > 2)]
-allGames = allGames[(allGames['period'] > 2)]
-(allGames['expected']).plot.hist(bins=20)
-plt.show()
+for league, games in allGames.groupby("league"):
+    # games = games[(games['period'] > 4)]
+    games = games[(games['period'] >= 4)]
+    print(league + ": " + str(((games['expected'] - games['result'])**2).mean()))
