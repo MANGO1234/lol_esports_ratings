@@ -296,9 +296,9 @@ Promise.all([
     var br2016 = [na16brM, eu16brM, lck16brM, lpl16brM, lms16brM];
     var ar2017 = [na17arM, eu17arM, lck17arM];
     var ar20172 = [na17arM, eu17arM, lck17arM, lpl17arM];
-    var ch = 0;
+    var ch = 2;
     var t = [];
-    var todo = br2016;
+    var todo = ar2017;
     var group = sDefaults.eu17ar.A;
     var fn = glicko_week2;
     if (ch === 0) {

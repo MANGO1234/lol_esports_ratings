@@ -16,9 +16,9 @@ allGames = data.getGames()
 
 model = m.TrueskillModel
 model = m.TrueskillModelPeriod
-model = m.GlickoModelPerGame
 model = m.GlickoModelPeriod
 model = m.GlickoModel
+model = m.GlickoModelPerGame
 
 
 def winRateBo1ToBo3(p):
@@ -47,7 +47,7 @@ for league, games in allGames.groupby('league'):
         i += 1
     print()
     print('Mean of Ratings: ' + str(np.mean(list(map(lambda t: model.getRatingMu(t['rating']), teams)))))
-    print('Mean of Ratings: ' + str(np.std(list(map(lambda t: model.getRatingMu(t['rating']), teams)))))
+    print('SD of Ratings: ' + str(np.std(list(map(lambda t: model.getRatingMu(t['rating']), teams)))))
     print('Range of Ratings: ' + str(model.getRatingMu(teams[0]['rating']) - model.getRatingMu(teams[-1]['rating'])))
     print()
 
