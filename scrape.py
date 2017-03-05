@@ -65,6 +65,36 @@ if not (len(sys.argv) > 2 and sys.argv[2] == "-d"):
                 with open('matches/raw/' + league + '.html', 'w') as f:
                     f.write(text)
 
+        lms17arMissing = [
+            (1, '2017-01-21', 'ahq e-Sports Club', 'Flash Wolves', 1),
+            (2, '2017-01-21', 'Flash Wolves', 'ahq e-Sports Club', 1),
+            (3, '2017-01-21', 'ahq e-Sports Club', 'Flash Wolves', 0),
+            (4, '2017-01-21', 'Hong Kong Esports', 'Fireball', 0),
+            (5, '2017-01-21', 'Fireball', 'Hong Kong Esports', 0),
+            (6, '2017-01-21', 'Hong Kong Esports', 'Fireball', 1),
+            (7, '2017-01-22', 'Machi E-Sports', 'J Team', 1),
+            (8, '2017-01-22', 'J Team', 'Machi E-Sports', 1),
+            (9, '2017-01-22', 'Machi E-Sports', 'J Team', 0),
+            (10, '2017-01-22', 'eXtreme Gamers', 'Wayi Spider', 0),
+            (11, '2017-01-22', 'Wayi Spider', 'eXtreme Gamers', 0),
+            (12, '2017-01-22', 'eXtreme Gamers', 'Wayi Spider', 1),
+            (13, '2017-02-03', 'Flash Wolves', 'J Team', 1),
+            (14, '2017-02-03', 'J Team', 'Flash Wolves', 0),
+            (15, '2017-02-03', 'Wayi Spider', 'Hong Kong Esports', 0),
+            (16, '2017-02-03', 'Hong Kong Esports', 'Wayi Spider', 1),
+            (17, '2017-02-04', 'Machi E-Sports', 'Flash Wolves', 0),
+            (18, '2017-02-04', 'Flash Wolves', 'Machi E-Sports', 1),
+            (19, '2017-02-04', 'eXtreme Gamers', 'J Team', 0),
+            (20, '2017-02-04', 'J Team', 'eXtreme Gamers', 1),
+            (21, '2017-02-05', 'Fireball', 'eXtreme Gamers', 1),
+            (22, '2017-02-05', 'eXtreme Gamers', 'Fireball', 0),
+            (23, '2017-02-05', 'ahq e-Sports Club', 'Machi E-Sports', 1),
+            (24, '2017-02-05', 'Machi E-Sports', 'ahq e-Sports Club', 0)
+        ]
+        if league == 'lms17ar':
+            for (id, date, t1, t2, result) in lms17arMissing:
+                matches.append(('lms17ar', id, date, '7.1', t1, t2, result, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''))
+
         print('parsing ' + league)
         d = pq(text)
         data = d('.wikitable tr')
@@ -119,7 +149,7 @@ if not (len(sys.argv) > 2 and sys.argv[2] == "-d"):
             t2p5 = players[4]
             link = d(c[-2]).find('a').text()
             matches.append((
-                league, data.length - 1 - i, date, patch, t1, t2, result, link,
+                league, data.length - 1 - i + (24 if league == 'lms17ar' else 0), date, patch, t1, t2, result, link,
                 t1b1, t1b2, t1b3, t1b4, t1b5,
                 t2b1, t2b2, t2b3, t2b4, t2b5,
                 t1p1, t1p2, t1p3, t1p4, t1p5,
