@@ -48,8 +48,12 @@ for league, games in allGames.groupby("league"):
     g = games[(games['period'] >= 4) & (games['matchGame'] == 3)]
     print(str(((g['expected'] - g['result'])**2).mean()) + '(' + str(len(g.index)) + ')')
 
-print(len(allGames[(allGames["patch"] == "7.3") & (allGames["result"] == 1)]) / len(allGames[allGames["patch"] == "7.3"]))
+print()
 print(len(allGames[allGames["patch"] == "7.1"]))
+print(len(allGames[(allGames["patch"] == "7.1") & (allGames["result"] == 1)]) / len(allGames[allGames["patch"] == "7.1"]))
 print(len(allGames[allGames["patch"] == "7.2"]))
+print(len(allGames[(allGames["patch"] == "7.2") & (allGames["result"] == 1)]) / len(allGames[allGames["patch"] == "7.2"]))
 print(len(allGames[allGames["patch"] == "7.3"]))
-print(len(allGames[(allGames["patch"] == "7.3") & (allGames["result"] == 1)]))
+print(len(allGames[(allGames["patch"] == "7.3") & (allGames["result"] == 1)]) / len(allGames[allGames["patch"] == "7.3"]))
+print(len(allGames[allGames["patch"] == "7.4"]))
+print(len(allGames[(allGames["patch"] == "7.4") & (allGames["result"] == 1)]) / len(allGames[allGames["patch"] == "7.4"]))

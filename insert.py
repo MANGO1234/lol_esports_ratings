@@ -20,11 +20,6 @@ key = sys.argv[1]
 if key == 'na':
     league = 'na17ar'
     matches = [
-        ('tsm', 'c9', 1, '2017-02-18'),
-        ('tsm', 'c9', 0, '2017-02-18'),
-        ('tsm', 'c9', 1, '2017-02-18'),
-        ('nv', 'fox', 1, '2017-02-18'),
-        ('nv', 'fox', 1, '2017-02-18')
     ]
 
 with sql.connect('matches/matches.db') as con:

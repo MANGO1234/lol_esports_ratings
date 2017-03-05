@@ -31,19 +31,29 @@ for league, games in allGames.groupby('league'):
     model.applyModel(allGames, games, teams)
     leagueTeams[league] = teams
 
-
 # need to separate so we can see the new changes in iteration
 for league, games in allGames.groupby('league'):
     teams = leagueTeams[league]
+    for name, team in teams.items():
+        g = games[games['t1'] == name].append(games[games['t2'] == name])
+        m = min(g['period'].max(), 4)
+        g = g[g['period'] >= m]
+        team['brier'] = ((g['expected'] - g['result'])**2).mean()
+
     print('***** ' + config['tournaments'][league]['title'] + ' *****')
     print('*** Current Ratings ***')
-    print('{:2}  {:25}  {:11}  {:6}  {:6}'.format('', 'Team', 'Games (W/L)', 'Rating', 'SD'))
+    print('{:2}  {:25}  {:11}  {:6}  {:5}  {:6}'.format('', 'Team', 'Games (W/L)', 'Rating', 'SD', 'Brier'))
     i = 1
     teams = sorted(teams.values(), key=lambda x: model.getRatingMu(x['rating']), reverse=True)
     for team in teams:
-        print('{:2d}  {:25.25}  {:<3d} ({:>2d}/{:>2d})  {:<6.1f}  {:<6.1f}'.format(i, team['name'], team['games'], team['wins'],
-                                                                                   team['losses'], model.getRatingMu(team['rating']),
-                                                                                   model.getRatingSigma(team['rating'])))
+        print('{:2d}  {:25.25}  {:<3d} ({:>2d}/{:>2d})  {:<6.1f}  {:<5.1f}  {:<0.4f}'.format(i,
+                                                                                             team['name'],
+                                                                                             team['games'],
+                                                                                             team['wins'],
+                                                                                             team['losses'],
+                                                                                             model.getRatingMu(team['rating']),
+                                                                                             model.getRatingSigma(team['rating']),
+                                                                                             team['brier']))
         i += 1
     print()
     print('Mean of Ratings: ' + str(np.mean(list(map(lambda t: model.getRatingMu(t['rating']), teams)))))
@@ -60,6 +70,7 @@ for league, games in allGames.groupby('league'):
     print()
 
     print('**** Estimated Win Rates (BO1) ****')
+    print(('{:6s}' + ('{:8s} ' * len(teams))).format('', *[t['shortName'] for t in teams]))
     for team in teams:
         print(('{:6s}' + ('{:<8.2f} ' * len(teams))).format(team['shortName'], *[100 * model.expectedWinRate(team['rating'], t['rating']) for t in teams]))
     print()
