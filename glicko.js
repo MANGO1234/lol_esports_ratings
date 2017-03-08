@@ -63,12 +63,13 @@ s.getMatchesWithDetails(key).then(s.transformMatches).then(function(ms) {
 
     function write(s) {
         if (s !== undefined && s !== '') {
-            stream.write(s);
+            // stream.write(s);
             console.log(s);
         } else {
             console.log();
         }
-        stream.write('\n');
+        // stream.write('\n');
+        // console.log(s);
     }
 
     stream.once('open', function() {

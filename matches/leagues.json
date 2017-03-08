@@ -205,6 +205,7 @@
         "lpl16a": ["lpl16ar", "lpl16ap"],
         "lpl16b": ["lpl16br", "lpl16bp"],
         "lpl": ["lpl17ar"],
+        "lspl": ["lspl17ar"],
         "lms16b": ["lms16br", "lms16bp"],
         "lms": ["lms17ar"]
     }

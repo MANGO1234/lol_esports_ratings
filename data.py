@@ -44,7 +44,9 @@ class Games():
             ('lck15br', '2015-07-24'),
             ('lck17ar', '2017-01-21'),
             ('lck17ar', '2017-02-04'),
-            ('lck17ar', '2017-02-11')
+            ('lck17ar', '2017-02-11'),
+            ('lck17ar', '2017-02-18'),
+            ('lck17ar', '2017-03-04')
         }
 
         for league, games in rawGames.groupby('league'):

@@ -279,6 +279,7 @@ Promise.all([
     getMatches("na17ar"),
     getMatches("eu17ar"),
     getMatches("lpl17ar"),
+    getMatches("lspl17ar"),
     getMatches("lms17ar")
 ]).then(function(a) {
     var lck15arM = a[0];
@@ -294,13 +295,15 @@ Promise.all([
     var na17arM = a[10];
     var eu17arM = a[11];
     var lpl17arM = a[12];
-    var lms17arM = a[13];
+    var lspl17arM = a[13];
+    var lms17arM = a[14];
     var br2016 = [na16brM, eu16brM, lck16brM, lpl16brM, lms16brM];
     var ar2017 = [na17arM, eu17arM, lck17arM];
     var ar20172 = [na17arM, eu17arM, lck17arM, lpl17arM, lms17arM];
     var ch = 1;
     var t = [];
     var todo = ar2017;
+    var todo = [lspl17arM];
     var group = sDefaults.eu17ar.A;
     var fn = glicko_week2;
     if (ch === 0) {
