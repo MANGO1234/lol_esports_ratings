@@ -57,3 +57,18 @@ print(len(allGames[allGames["patch"] == "7.3"]))
 print(len(allGames[(allGames["patch"] == "7.3") & (allGames["result"] == 1)]) / len(allGames[allGames["patch"] == "7.3"]))
 print(len(allGames[allGames["patch"] == "7.4"]))
 print(len(allGames[(allGames["patch"] == "7.4") & (allGames["result"] == 1)]) / len(allGames[allGames["patch"] == "7.4"]))
+
+# a = [1]
+
+# import matplotlib.pyplot as plt
+
+# # the histogram of the data
+# n, bins, patches = plt.hist(a, 50, normed=1, facecolor='g', alpha=0.75)
+
+
+# plt.xlabel('Smarts')
+# plt.ylabel('Probability')
+# plt.title('Histogram of IQ')
+# plt.text(60, .025, r'$\mu=100,\ \sigma=15$')
+# plt.grid(True)
+# plt.show()

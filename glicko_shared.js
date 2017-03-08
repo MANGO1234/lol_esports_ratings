@@ -183,6 +183,10 @@ function calculateModel(matches, type, options) {
                 newPeriod.matches.push(match);
             } else if (match.league === "lck17ar" && match.date === "2017-02-11") {
                 newPeriod.matches.push(match);
+            } else if (match.league === "lck17ar" && match.date === "2017-02-18") {
+                newPeriod.matches.push(match);
+            } else if (match.league === "lck17ar" && match.date === "2017-03-04") {
+                newPeriod.matches.push(match);
             } else {
                 newPeriod.endDate = newPeriod.matches[newPeriod.matches.length - 1].date;
                 ratingPeriods.push(newPeriod);

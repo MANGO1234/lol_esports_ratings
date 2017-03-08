@@ -59,6 +59,11 @@ for league, games in allGames.groupby('league'):
     print('Mean of Ratings: ' + str(np.mean(list(map(lambda t: model.getRatingMu(t['rating']), teams)))))
     print('SD of Ratings: ' + str(np.std(list(map(lambda t: model.getRatingMu(t['rating']), teams)))))
     print('Range of Ratings: ' + str(model.getRatingMu(teams[0]['rating']) - model.getRatingMu(teams[-1]['rating'])))
+    print('Brier: ' + str(((games['expected'] - games['result'])**2).mean()))
+    g = games
+    m = min(g['period'].max(), 4)
+    g = g[g['period'] >= m]
+    print('Brier (Since week 3): ' + str(((g['expected'] - g['result'])**2).mean()))
     print()
 
     print('**** Ratings by Period ****')

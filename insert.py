@@ -17,9 +17,16 @@ for k, v in namesTranslate.items():
 
 key = sys.argv[1]
 
-if key == 'na':
-    league = 'na17ar'
+if key == 'lspl':
+    league = 'lspl17ar'
     matches = [
+        ("ING", "SAT", 0, "2017-03-07"),
+        ("SAT", "ING", 1, "2017-03-07"),
+        ("LD", "RY", 0, "2017-03-07"),
+        ("RY", "LD", 1, "2017-03-07"),
+        ("DAN", "YM", 1, "2017-03-07"),
+        ("DAN", "YM", 0, "2017-03-07"),
+        ("YM", "DAN", 1, "2017-03-07")
     ]
 
 with sql.connect('matches/matches.db') as con:
