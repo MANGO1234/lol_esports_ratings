@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import ratingModels as m
 
 
-from data import getLeagues, getGames
+from data import getLeagues, getGames, getGamesWithDetails
 
 with open('matches/leagues.json') as data_file:
     config = json.load(data_file)
@@ -30,6 +30,7 @@ model = m.GlickoModelPerGame
 
 data = getGames(getLeagues(key))
 allGames = data.getGames()
+print(allGames)
 leagueTeams = {}
 for league, games in allGames.groupby('league'):
     teams = m.getTeams(games)
