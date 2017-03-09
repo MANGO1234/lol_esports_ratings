@@ -23,9 +23,7 @@ def winRateBo1ToBo3(p):
 
 
 model = m.TrueskillModel
-model = m.TrueskillModelPeriod
 model = m.GlickoModel
-model = m.GlickoModelPeriod
 model = m.GlickoModelPerGame
 
 data = getGames(getLeagues(key))
