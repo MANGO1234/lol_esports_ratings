@@ -181,6 +181,13 @@
             "bo": 3,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LSPL%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
             "finished": false
+        },
+        "ck17ar": {
+            "title": "Challengers Korea 2017 Spring Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:Challengers%20Korea%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": false
         }
     },
     "combined": {
@@ -205,9 +212,10 @@
         "lpl16a": ["lpl16ar", "lpl16ap"],
         "lpl16b": ["lpl16br", "lpl16bp"],
         "lpl": ["lpl17ar"],
-        "lspl": ["lspl17ar"],
         "lms16b": ["lms16br", "lms16bp"],
         "lms": ["lms17ar"],
+        "lspl": ["lspl17ar"],
+        "ck": ["ck17ar"],
         "reg": ["lck15ar", "lck15br", "lck16ar", "lck16br", "lpl16ar", "lpl16br", "eu16br", "na16br", "lms16br", "lspl17ar", "lck17ar", "lpl16ar", "lpl17ar", "eu17ar", "na17ar", "lms17ar"]
     }
 }

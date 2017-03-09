@@ -20,6 +20,7 @@ class Games():
         rawGames['matchLeague'] = 0
         rawGames['matchAll'] = 0
         rawGames['matchGame'] = 0
+        rawGames['prevGameIx'] = -1
         rawGames['timestamp'] = rawGames['date'].map(lambda row: time.mktime(time.strptime(row, '%Y-%m-%d')))
         if details:
             rawGames['data'] = rawGames['data'].map(lambda x: None if x is None else json.loads(x))
@@ -48,7 +49,13 @@ class Games():
             ('lck17ar', '2017-02-04'),
             ('lck17ar', '2017-02-11'),
             ('lck17ar', '2017-02-18'),
-            ('lck17ar', '2017-03-04')
+            ('lck17ar', '2017-03-04'),
+            ('ck17ar', '2017-01-20'),
+            ('ck17ar', '2017-02-10'),
+            ('ck17ar', '2017-02-17'),
+            ('ck17ar', '2017-02-24'),
+            ('ck17ar', '2017-03-03'),
+            ('ck17ar', '2017-03-05'),
         }
 
         for league, games in rawGames.groupby('league'):
@@ -75,6 +82,7 @@ class Games():
                     rawGames.set_value(i, 'matchGame', 1)
                     t1 = games.ix[i, 't1']
                     t2 = games.ix[i, 't2']
+                    prevGameIx = i
                     matchGame = 2
                     for l in range(k + 1, len(indexes)):
                         j = indexes[l]
@@ -83,6 +91,8 @@ class Games():
                             rawGames.set_value(j, 'matchLeague', matchLeagues[league])
                             rawGames.set_value(j, 'matchAll', matchAll)
                             rawGames.set_value(j, 'matchGame', matchGame)
+                            rawGames.set_value(j, 'prevGameIx', prevGameIx)
+                            prevGameIx = j
                             matchGame += 1
                     match += 1
                     matchLeagues[league] += 1
