@@ -36,6 +36,7 @@ for league, games in allGames.groupby('league'):
     leagueTeams[league] = teams
 
 games = allGames
+print(games)
 for league, games in allGames.groupby("league"):
     print(league)
     g = games[(games['period'] >= 4)]
