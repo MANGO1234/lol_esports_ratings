@@ -103,7 +103,11 @@ if not (len(sys.argv) > 2 and sys.argv[2] == "-d"):
             date = d(c[0]).text()
             patch = d(c[1]).text() if d(c[1]).text() != '-' else ''
             t1 = d(c[2]).find('a').text()
+            if t1 == 'QG Reapers':
+                t1 = 'Qiao Gu Reapers'
             t2 = d(c[3]).find('a').text()
+            if t2 == 'QG Reapers':
+                t2 = 'Qiao Gu Reapers'
             result = d(c[4]).text()
             if result == 'red':
                 result = 0
