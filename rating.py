@@ -15,8 +15,6 @@ data = getGames(getLeagues(key))
 allGames = data.getGames()
 
 model = m.TrueskillModel
-model = m.TrueskillModelPeriod
-model = m.GlickoModelPeriod
 model = m.GlickoModel
 model = m.GlickoModelPerGame
 

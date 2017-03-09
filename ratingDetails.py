@@ -63,9 +63,7 @@ for k, v in namesTranslateP.items():
 key = sys.argv[1]
 
 model = m.TrueskillModel
-model = m.TrueskillModelPeriod
 model = m.GlickoModel
-model = m.GlickoModelPeriod
 model = m.GlickoModelPerGame
 
 leagues = getLeagues(key)
