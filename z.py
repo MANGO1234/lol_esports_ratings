@@ -30,7 +30,21 @@ def brierStr(games):
     return str(brier(games)) + ' (' + str(len(games.index)) + ')'
 
 
-WEEK = 5
+WEEK_BEGIN = 5
+WEEK_END = 20
+WEEK = 4
+
+BLUE_SIDE = {
+    # 'na17ar': 85,
+    # 'eu17ar': 85,
+    # 'lck17ar': 85,
+    # 'lpl17ar': 85,
+    # 'na16br': 20,
+    # 'eu16br': 20,
+    # 'lck16br': 20,
+    # 'lpl16br': 20,
+    # 'lms16br': 20
+}
 
 
 def quickOutput(title, model):
@@ -39,11 +53,11 @@ def quickOutput(title, model):
     leagueTeams = {}
     for league, games in allGames.groupby('league'):
         teams = m.getTeams(games)
-        model.applyModel(allGames, games, teams)
+        model.applyModel(allGames, games, teams, BLUE_SIDE)
         leagueTeams[league] = teams
 
-    print('***** ' + title + ' *****')
-    games = allGames
+    # print('***** ' + title + ' *****')
+    # games = allGames
     # for league, games in allGames.groupby("league"):
     #     print('*** ' + league + ' ***')
     #     print(brierStr(games[(games['period'] >= WEEK)]))
@@ -53,14 +67,33 @@ def quickOutput(title, model):
 
     print()
     print('*** all ***')
-    print(brierStr(allGames[allGames['period'] >= WEEK]))
-    print(brierStr(allGames[(allGames['period'] >= WEEK) & (allGames['matchGame'] == 1)]))
-    print(brierStr(allGames[(allGames['period'] >= WEEK) & (allGames['matchGame'] == 2)]))
-    print(brierStr(allGames[(allGames['period'] >= WEEK) & (allGames['matchGame'] == 3)]))
+    print(brierStr(allGames[(allGames['period'] >= WEEK_BEGIN) & (allGames['period'] <= WEEK_END)]))
+    print(brierStr(allGames[((allGames['period'] >= WEEK_BEGIN) & (allGames['period'] <= WEEK_END)) & (allGames['matchGame'] == 1)]))
+    print(brierStr(allGames[((allGames['period'] >= WEEK_BEGIN) & (allGames['period'] <= WEEK_END)) & (allGames['matchGame'] == 2)]))
+    print(brierStr(allGames[((allGames['period'] >= WEEK_BEGIN) & (allGames['period'] <= WEEK_END)) & (allGames['matchGame'] == 3)]))
     print()
+
+
+def blueSideAdvantage(leagues, model):
+    blue = BLUE_SIDE.copy()
+    data = getGames(getLeagues(key))
+    allGames = data.getGames()
+    leagueGames = allGames[allGames['league'].isin(leagues)]
+
+    for i in range(-20, 120, 5):
+        leagueTeams = {}
+        for league, games in leagueGames.groupby('league'):
+            blue[league] = i
+            teams = m.getTeams(games)
+            model.applyModel(allGames, games, teams, blue)
+            leagueTeams[league] = teams
+        print(i, brierStr(allGames[(allGames['period'] >= WEEK)]))
+
 
 type = 1
 if type == 1:
     quickOutput('TrueskillModel', m.TrueskillModel)
     quickOutput('GlickoModel', m.GlickoModel)
     quickOutput('GlickoModelPerGame', m.GlickoModelPerGame)
+elif type == 2:
+    blueSideAdvantage(getLeagues(key), m.GlickoModel)

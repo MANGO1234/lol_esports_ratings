@@ -38,8 +38,8 @@ def getTeams(games):
 ts.setup(mu=1500, sigma=300, beta=200, draw_probability=0)
 
 
-def trueskillExpectedWinRate(r1, r2):
-    deltaMu = r1.mu - r2.mu
+def trueskillExpectedWinRate(r1, r2, blueSide=0):
+    deltaMu = r1.mu - r2.mu + blueSide
     sumSigma = r1.sigma ** 2 + r2.sigma ** 2
     denominator = math.sqrt(4 * (200 * 200) + sumSigma)
     return ts.global_env().cdf(deltaMu / denominator)
@@ -49,14 +49,14 @@ def g(variance):
     return 1 / math.sqrt(1 + 3 * math.pow(math.log(10) / 400 / math.pi, 2) * variance)
 
 
-def glickoExpectedWinRate(r1, r2):
-    return 1 / (1 + math.pow(10, g(r1.getRd() * r1.getRd() + r2.getRd() * r2.getRd()) * (r2.getRating() - r1.getRating()) / 400))
+def glickoExpectedWinRate(r1, r2, blueSide=0):
+    return 1 / (1 + math.pow(10, g(r1.getRd() * r1.getRd() + r2.getRd() * r2.getRd()) * (r2.getRating() - r1.getRating() - blueSide) / 400))
 
 
 class TrueskillModel():
 
     @staticmethod
-    def applyModel(allGames, games, teams):
+    def applyModel(allGames, games, teams, blueSideAdvantage={}):
         for team in teams:
             teams[team]['rating'] = ts.Rating()
         if 'expected' not in allGames:
@@ -64,8 +64,10 @@ class TrueskillModel():
         if 'snapshot' not in allGames:
             allGames['snapshot'] = 0
         allGames['snapshot'] = allGames['snapshot'].astype(dict)
+        league = games['league'].iloc[0]
+        blueSide = 0 if league not in blueSideAdvantage else blueSideAdvantage[league]
         for i in games.index:
-            allGames.set_value(i, 'expected', trueskillExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
+            allGames.set_value(i, 'expected', trueskillExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], blueSide))
             (teams[games.ix[i, 't1']]['rating'],), (teams[games.ix[i, 't2']]['rating'],) = ts.rate(
                 [(teams[games.ix[i, 't1']]['rating'],), (teams[games.ix[i, 't2']]['rating'],)],
                 [1 - games.ix[i, 'result'], games.ix[i, 'result']])
@@ -87,7 +89,7 @@ class TrueskillModel():
 class TrueskillModelPeriod():
 
     @staticmethod
-    def applyModel(allGames, games, teams):
+    def applyModel(allGames, games, teams, blueSideAdvantage={}):
         for team in teams:
             teams[team]['rating'] = ts.Rating()
         if 'expected' not in allGames:
@@ -95,9 +97,11 @@ class TrueskillModelPeriod():
         if 'snapshot' not in allGames:
             allGames['snapshot'] = 0
         allGames['snapshot'] = allGames['snapshot'].astype(dict)
+        league = games['league'].iloc[0]
+        blueSide = 0 if league not in blueSideAdvantage else blueSideAdvantage[league]
         for period, periodGames in games.groupby("period"):
             for i in periodGames.index:
-                allGames.set_value(i, 'expected', trueskillExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
+                allGames.set_value(i, 'expected', trueskillExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], blueSide))
             for i in periodGames.index:
                 (teams[games.ix[i, 't1']]['rating'],), (teams[games.ix[i, 't2']]['rating'],) = ts.rate(
                     [(teams[games.ix[i, 't1']]['rating'],), (teams[games.ix[i, 't2']]['rating'],)],
@@ -120,7 +124,7 @@ class TrueskillModelPeriod():
 class GlickoModel():
 
     @staticmethod
-    def applyModel(allGames, games, teams):
+    def applyModel(allGames, games, teams, blueSideAdvantage={}):
         ratings = []
         for team in teams:
             teams[team]['rating'] = glicko.Player()
@@ -130,10 +134,12 @@ class GlickoModel():
         if 'snapshot' not in allGames:
             allGames['snapshot'] = 0
         allGames['snapshot'] = allGames['snapshot'].astype(dict)
+        league = games['league'].iloc[0]
+        blueSide = 0 if league not in blueSideAdvantage else blueSideAdvantage[league]
         for period, periodGames in games.groupby("period"):
             snapshot = {k: v['rating'].clone() for k, v in teams.items()}
             for i in periodGames.index:
-                allGames.set_value(i, 'expected', glickoExpectedWinRate(snapshot[games.ix[i, 't1']], snapshot[games.ix[i, 't2']]))
+                allGames.set_value(i, 'expected', glickoExpectedWinRate(snapshot[games.ix[i, 't1']], snapshot[games.ix[i, 't2']], blueSide))
                 glicko.updateResults([(snapshot[games.ix[i, 't1']], snapshot[games.ix[i, 't2']], games.ix[i, 'result'])])
                 allGames.set_value(i, 'snapshot', {k: v.clone() for k, v in snapshot.items()})
             g = []
@@ -158,7 +164,7 @@ class GlickoModel():
 class GlickoModelPerGame():
 
     @staticmethod
-    def applyModel(allGames, games, teams):
+    def applyModel(allGames, games, teams, blueSideAdvantage={}):
         for team in teams:
             teams[team]['rating'] = glicko.Player()
         if 'expected' not in allGames:
@@ -166,8 +172,10 @@ class GlickoModelPerGame():
         if 'snapshot' not in allGames:
             allGames['snapshot'] = 0
         allGames['snapshot'] = allGames['snapshot'].astype(dict)
+        league = games['league'].iloc[0]
+        blueSide = 0 if league not in blueSideAdvantage else blueSideAdvantage[league]
         for i in games.index:
-            allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
+            allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], blueSide))
             glicko.updateResults([(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], games.ix[i, 'result'])])
             allGames.set_value(i, 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
 
@@ -187,7 +195,7 @@ class GlickoModelPerGame():
 class GlickoModelPeriod():
 
     @staticmethod
-    def applyModel(allGames, games, teams):
+    def applyModel(allGames, games, teams, blueSideAdvantage={}):
         ratings = []
         for team in teams:
             teams[team]['rating'] = glicko.Player()
@@ -196,10 +204,12 @@ class GlickoModelPeriod():
             allGames['expected'] = np.nan
         if 'snapshot' not in allGames:
             allGames['snapshot'] = 0
+        league = games['league'].iloc[0]
+        blueSide = 0 if league not in blueSideAdvantage else blueSideAdvantage[league]
         allGames['snapshot'] = allGames['snapshot'].astype(dict)
         for period, periodGames in games.groupby("period"):
             for i in periodGames.index:
-                allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating']))
+                allGames.set_value(i, 'expected', glickoExpectedWinRate(teams[games.ix[i, 't1']]['rating'], teams[games.ix[i, 't2']]['rating'], blueSide))
             for i in periodGames.index:
                 allGames.set_value(i, 'snapshot', {k: v['rating'].clone() for k, v in teams.items()})
             g = []
