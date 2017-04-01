@@ -90,6 +90,21 @@ def blueSideAdvantage(leagues, model):
         print(i, brierStr(allGames[(allGames['period'] >= WEEK)]))
 
 
+def beta(leagues, model):
+    blue = BLUE_SIDE.copy()
+    data = getGames(getLeagues(key))
+    allGames = data.getGames()
+    leagueGames = allGames[allGames['league'].isin(leagues)]
+
+    for i in range(-20, 120, 5):
+        leagueTeams = {}
+        for league, games in leagueGames.groupby('league'):
+            teams = m.getTeams(games)
+            model.applyModel(allGames, games, teams, blue)
+            leagueTeams[league] = teams
+        print(i, brierStr(allGames[(allGames['period'] >= WEEK)]))
+
+
 type = 1
 if type == 1:
     quickOutput('TrueskillModel', m.TrueskillModel)
@@ -97,3 +112,5 @@ if type == 1:
     quickOutput('GlickoModelPerGame', m.GlickoModelPerGame)
 elif type == 2:
     blueSideAdvantage(getLeagues(key), m.GlickoModel)
+elif type == 3:
+    beta(getLeagues(key), m.GlickoModel)
