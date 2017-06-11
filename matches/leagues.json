@@ -251,6 +251,7 @@
         "na16a": ["na16ar", "na16ap"],
         "na16b": ["na16br", "na16bp"],
         "na17a": ["na17ar", "na17ap"],
+        "na2": ["na17ar", "na17br"],
         "na": ["na17br"],
         "eu16b": ["eu16br", "eu16bp"],
         "eu17a": ["eu17ar", "eu17ap"],
