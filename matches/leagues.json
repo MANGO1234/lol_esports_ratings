@@ -33,6 +33,20 @@
             "type": "regular",
             "bo": 3,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:NA%20LCS%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "na17ap": {
+            "title": "NA 2017 Spring Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:NA%20LCS%202017%20Spring%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "na17br": {
+            "title": "NA 2017 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:NA%20LCS%202017%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true",
             "finished": false
         },
         "eu16br": {
@@ -54,6 +68,20 @@
             "type": "regular",
             "bo": 3,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:EU%20LCS%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "eu17ap": {
+            "title": "EU 2017 Spring Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:EU%20LCS%202017%20Spring%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "eu17br": {
+            "title": "EU 2017 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:EU%20LCS%202017%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true",
             "finished": false
         },
         "lck15ar": {
@@ -117,6 +145,20 @@
             "type": "regular",
             "bo": 3,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "lck17ap": {
+            "title": "LCK 2017 Spring Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202017%20Spring%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "lck17br": {
+            "title": "LCK 2017 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LCK%202017%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true",
             "finished": false
         },
         "lpl16ar": {
@@ -152,6 +194,20 @@
             "type": "regular",
             "bo": 3,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "lpl17ap": {
+            "title": "LPL 2017 Spring Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202017%20Spring%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "lpl17br": {
+            "title": "LPL 2017 Summer Split Regular Season",
+            "type": "regular",
+            "bo": 3,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LPL%202017%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true",
             "finished": false
         },
         "lms16br": {
@@ -173,49 +229,53 @@
             "type": "regular",
             "bo": 3,
             "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LMS%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
-            "finished": false
+            "finished": true
         },
-        "lspl17ar": {
-            "title": "LSPL 2017 Spring Split Regular Season",
+        "lms17ap": {
+            "title": "LMS 2017 Spring Split Playoff",
+            "type": "playoff",
+            "bo": 5,
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LMS%202017%20Spring%20Playoffs&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "finished": true
+        },
+        "lms17br": {
+            "title": "LMS 2017 Summer Split Regular Season",
             "type": "regular",
             "bo": 3,
-            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LSPL%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
-            "finished": false
-        },
-        "ck17ar": {
-            "title": "Challengers Korea 2017 Spring Split Regular Season",
-            "type": "regular",
-            "bo": 3,
-            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:Challengers%20Korea%202017%20Spring&MHT%5Btext%5D=Yes&wpRunQuery=true",
+            "link": "http://lol.esportswikis.com/wiki/Special:RunQuery/MatchHistoryTournament?MHT%5Btournament%5D=Concept:LMS%202017%20Summer&MHT%5Btext%5D=Yes&wpRunQuery=true",
             "finished": false
         }
     },
     "combined": {
-        "new": ["na17ar", "eu17ar", "lck17ar", "lpl17ar", "lms17ar"],
+        "new": ["na17br", "eu17br", "lck17br", "lpl17br", "lms17br"],
         "na16a": ["na16ar", "na16ap"],
         "na16b": ["na16br", "na16bp"],
-        "na": ["na17ar"],
+        "na17a": ["na17ar", "na17ap"],
+        "na": ["na17br"],
         "eu16b": ["eu16br", "eu16bp"],
-        "eu": ["eu17ar"],
+        "eu17a": ["eu17ar", "eu17ap"],
+        "eu": ["eu17br"],
         "lcks": ["lck15ar", "lck15ap", "lck15br", "lck15bp", "lck16ar", "lck16ap", "lck16br", "lck16bp"],
+        "lck15a": ["lck15ar", "lck15ap"],
+        "lck15b": ["lck15br", "lck15bp"],
+        "lck16a": ["lck16ar", "lck16ap"],
+        "lck16b": ["lck16br", "lck16bp"],
+        "lck17a": ["lck17ar", "lck17ap"],
+        "lck": ["lck17br"],
+        "lpl16a": ["lpl16ar", "lpl16ap"],
+        "lpl16b": ["lpl16br", "lpl16bp"],
+        "lpl17a": ["lpl17ar", "lpl17ap"],
+        "lpl": ["lpl17br"],
+        "lms16b": ["lms16br", "lms16bp"],
+        "lms17a": ["lms17ar", "lms17ap"],
+        "lms": ["lms17br"],
+
         "bor": ["lck15ar", "lck15br", "lck16ar", "lck16br", "lpl16ar", "lpl16br", "eu16br", "na16br", "lms16br"],
         "2016r": ["lck16ar", "lck16br", "lpl16br", "eu16br", "na16br", "lms16br"],
         "2016br": ["lck16br", "lpl16br", "eu16br", "na16br", "lms16br"],
         "2016brbo3": ["lck16br", "lpl16br", "na16br"],
         "2017ar": ["lck17ar", "lpl17ar", "eu17ar", "na17ar"],
         "2017ar2": ["lck17ar", "lpl17ar", "eu17ar", "na17ar", "lms17ar"],
-        "lck15a": ["lck15ar", "lck15ap"],
-        "lck15b": ["lck15br", "lck15bp"],
-        "lck16a": ["lck16ar", "lck16ap"],
-        "lck16b": ["lck16br", "lck16bp"],
-        "lck": ["lck17ar"],
-        "lpl16a": ["lpl16ar", "lpl16ap"],
-        "lpl16b": ["lpl16br", "lpl16bp"],
-        "lpl": ["lpl17ar"],
-        "lms16b": ["lms16br", "lms16bp"],
-        "lms": ["lms17ar"],
-        "lspl": ["lspl17ar"],
-        "ck": ["ck17ar"],
         "reg": ["lck15ar", "lck15br", "lck16ar", "lck16br", "lpl16ar", "lpl16br", "eu16br", "na16br", "lms16br", "lspl17ar", "lck17ar", "lpl16ar", "lpl17ar", "eu17ar", "na17ar", "lms17ar"]
     }
 }
