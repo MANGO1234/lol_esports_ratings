@@ -11,7 +11,8 @@ with open('matches/leagues.json') as data_file:
     config = json.load(data_file)
 
 key = sys.argv[1]
-data = getGames(getLeagues(key))
+treatAsOne = len(sys.argv) > 2 and sys.argv[2] == '-m'
+data = getGames(getLeagues(key), treatAsOne=treatAsOne)
 allGames = data.getGames()
 
 model = m.TrueskillModel
@@ -38,7 +39,7 @@ for league, games in allGames.groupby('league'):
         g = g[g['period'] >= m]
         team['brier'] = ((g['expected'] - g['result'])**2).mean()
 
-    print('***** ' + config['tournaments'][league]['title'] + ' *****')
+    print('***** ' + (config['tournaments'][league]['title'] if not treatAsOne else "Merged Games") + ' *****')
     print('*** Current Ratings ***')
     print('{:2}  {:25}  {:11}  {:6}  {:5}  {:6}'.format('', 'Team', 'Games (W/L)', 'Rating', 'SD', 'Brier'))
     i = 1

@@ -13,7 +13,7 @@ pd.set_option('display.width', 1000)
 
 class Games():
 
-    def __init__(self, rawGames, details=False):
+    def __init__(self, rawGames, details=False, treatAsOne=False):
         self.rawGames = rawGames
         rawGames['period'] = 0
         rawGames['match'] = 0
@@ -24,6 +24,8 @@ class Games():
         rawGames['timestamp'] = rawGames['date'].map(lambda row: time.mktime(time.strptime(row, '%Y-%m-%d')))
         if details:
             rawGames['data'] = rawGames['data'].map(lambda x: None if x is None else json.loads(x))
+        if treatAsOne:
+            rawGames['league'] = 'merged'
         rawGames.sort_values(['league', 'date', 'id'], ascending=True, inplace=True)
         rawGames.reset_index(drop=True, inplace=True)
 
@@ -113,11 +115,11 @@ def getLeagues(key):
         raise Exception("Key not find")
 
 
-def getGames(leagues):
+def getGames(leagues, treatAsOne=False):
     with sql.connect('matches/matches.db') as con:
-        return Games(pd.read_sql_query("select * from matches where league in ('" + "','".join(leagues) + "')", con))
+        return Games(pd.read_sql_query("select * from matches where league in ('" + "','".join(leagues) + "')", con), details=False, treatAsOne=treatAsOne)
 
 
-def getGamesWithDetails(leagues):
+def getGamesWithDetails(leagues, treatAsOne=False):
     with sql.connect('matches/matches.db') as con:
-        return Games(pd.read_sql_query("select * from matches m left natural join details d where m.league in ('" + "','".join(leagues) + "') order by m.date,m.id", con), True)
+        return Games(pd.read_sql_query("select * from matches m left natural join details d where m.league in ('" + "','".join(leagues) + "') order by m.date,m.id", con), details=True, treatAsOne=treatAsOne)
