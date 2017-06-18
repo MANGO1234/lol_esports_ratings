@@ -112,7 +112,7 @@ def getLeagues(key):
     elif key == 'all':
         return list(config['tournaments'].keys())
     else:
-        raise Exception("Key not find")
+        raise Exception("Key not find: ", key)
 
 
 def getGames(leagues, treatAsOne=False):
