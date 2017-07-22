@@ -199,6 +199,22 @@ if not (len(sys.argv) > 2 and sys.argv[2] == "-d"):
             (150, '2017-07-16', 'Echo Fox', 'Team EnVyUs', 1),
             (151, '2017-07-16', 'Team EnVyUs', 'Echo Fox', 1),
             (152, '2017-07-16', 'Echo Fox', 'Team EnVyUs', 0),
+
+            (153, '2017-07-21', 'Cloud9', 'Phoenix1', 1),
+            (154, '2017-07-21', 'Phoenix1', 'Cloud9', 1),
+            (155, '2017-07-21', 'Cloud9', 'Phoenix1', 1),
+            (156, '2017-07-21', 'Team Liquid', 'Team EnVyUs', 1),
+            (157, '2017-07-21', 'Team EnVyUs', 'Team Liquid', 1),
+            (158, '2017-07-21', 'Team Liquid', 'Team EnVyUs', 1),
+            (159, '2017-07-22', 'Team SoloMid', 'Team Dignitas', 0),
+            (160, '2017-07-22', 'Team Dignitas', 'Team SoloMid', 1),
+            (161, '2017-07-22', 'Counter Logic Gaming', 'Echo Fox', 1),
+            (162, '2017-07-22', 'Echo Fox', 'Counter Logic Gaming', 0),
+            (163, '2017-07-22', 'Phoenix1', 'Team Liquid', 0),
+            (164, '2017-07-22', 'Team Liquid', 'Phoenix1', 1),
+            (165, '2017-07-22', 'FlyQuest', 'Immortals', 1),
+            (166, '2017-07-22', 'Immortals', 'FlyQuest', 1),
+            (167, '2017-07-22', 'FlyQuest', 'Immortals', 0),
         ]
         if league == 'na17br':
             for (id, date, t1, t2, result) in na17brMissing:
